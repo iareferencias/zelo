@@ -36,29 +36,26 @@ function filterMessage(text: string): string {
 
 function PrayerGate({ onProceed }: { onProceed: () => void }) {
   return (
-    <div className="flex h-[calc(100vh-8rem)] items-center justify-center">
+    <div className="flex h-[calc(100vh-8rem)] items-center justify-center px-6">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="mx-auto max-w-md text-center px-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        className="mx-auto max-w-sm text-center"
       >
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-accent/10">
-          <Heart className="h-7 w-7 text-accent" />
-        </div>
-        <h2 className="mb-3 font-serif text-2xl font-semibold text-foreground">
+        <Heart className="mx-auto mb-6 h-6 w-6 text-muted-foreground" />
+        <h2 className="mb-3 text-xl font-semibold tracking-tight text-foreground">
           Momento de oração
         </h2>
-        <p className="mb-8 text-sm leading-relaxed text-muted-foreground">
+        <p className="mb-10 text-sm leading-relaxed text-muted-foreground">
           Antes de iniciar esta conversa, reserve um momento de oração.
-          Peça a Deus sabedoria, respeito e sinceridade para cada palavra.
+          Peça a Deus sabedoria e respeito para cada palavra.
         </p>
         <Button
-          size="lg"
-          className="rounded-full px-8 font-medium text-sm tracking-wide"
+          className="rounded-full px-8 text-sm font-medium"
           onClick={onProceed}
         >
-          Prosseguir com respeito
+          Prosseguir
         </Button>
       </motion.div>
     </div>
@@ -168,11 +165,7 @@ export default function Chat() {
     if (!newMsg.trim() || !matchId || !user || sending) return;
 
     if (dailyMsgCount >= 50) {
-      toast({
-        title: "Limite de mensagens atingido",
-        description: "Você pode enviar até 50 mensagens por dia.",
-        variant: "destructive",
-      });
+      toast({ title: "Limite atingido", description: "Até 50 mensagens por dia.", variant: "destructive" });
       return;
     }
 
@@ -205,7 +198,7 @@ export default function Chat() {
       reported_id: partnerId,
       reason: reportReason,
     });
-    toast({ title: "Denúncia enviada", description: "Obrigado por ajudar a manter o ZELO seguro." });
+    toast({ title: "Denúncia enviada" });
     setReportOpen(false);
     setReportReason("");
   }
@@ -213,7 +206,7 @@ export default function Chat() {
   if (gateLoading) {
     return (
       <div className="flex h-[calc(100vh-8rem)] items-center justify-center">
-        <div className="animate-pulse font-serif text-xl text-muted-foreground">Carregando...</div>
+        <p className="text-sm text-muted-foreground">Carregando...</p>
       </div>
     );
   }
@@ -224,57 +217,57 @@ export default function Chat() {
 
   return (
     <div className="page-transition flex h-[calc(100vh-8rem)] flex-col">
-      {/* Chat header */}
-      <div className="flex items-center justify-between border-b border-border/50 pb-3 mb-3">
+      {/* Header */}
+      <div className="flex items-center justify-between border-b border-border pb-4 mb-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground text-xs font-semibold">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground">
             {partnerName.charAt(0).toUpperCase()}
           </div>
           <div>
-            <h2 className="font-serif text-lg font-semibold text-foreground leading-tight">{partnerName}</h2>
-            <p className="text-[11px] text-muted-foreground">{dailyMsgCount}/50 mensagens hoje</p>
+            <h2 className="text-sm font-semibold text-foreground">{partnerName}</h2>
+            <p className="text-[11px] text-muted-foreground">{dailyMsgCount}/50 mensagens</p>
           </div>
         </div>
         <Dialog open={reportOpen} onOpenChange={setReportOpen}>
           <DialogTrigger asChild>
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive text-xs">
+            <Button variant="ghost" size="sm" className="text-xs text-muted-foreground">
               <Flag className="mr-1 h-3.5 w-3.5" />
               Denunciar
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle className="font-serif">Denunciar usuário</DialogTitle>
+              <DialogTitle>Denunciar</DialogTitle>
             </DialogHeader>
             <Textarea
-              placeholder="Descreva o motivo da denúncia..."
+              placeholder="Descreva o motivo..."
               value={reportReason}
               onChange={e => setReportReason(e.target.value)}
             />
-            <Button onClick={submitReport} disabled={!reportReason.trim()}>Enviar denúncia</Button>
+            <Button onClick={submitReport} disabled={!reportReason.trim()}>Enviar</Button>
           </DialogContent>
         </Dialog>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto space-y-1.5 pr-2 scroll-smooth">
+      <div className="flex-1 overflow-y-auto space-y-2 pr-1">
         <AnimatePresence initial={false}>
           {messages.map(m => (
             <motion.div
               key={m.id}
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.2 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.15 }}
               className={`flex ${m.sender_id === user?.id ? "justify-end" : "justify-start"}`}
             >
               <div className={`max-w-[70%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                 m.sender_id === user?.id
-                  ? "bg-primary text-primary-foreground rounded-br-md"
+                  ? "bg-foreground text-background rounded-br-md"
                   : "bg-muted text-foreground rounded-bl-md"
               }`}>
                 {m.body}
                 <div className={`mt-1 text-[10px] ${
-                  m.sender_id === user?.id ? "text-primary-foreground/50" : "text-muted-foreground/60"
+                  m.sender_id === user?.id ? "text-background/40" : "text-muted-foreground/50"
                 }`}>
                   {new Date(m.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                 </div>
@@ -286,20 +279,19 @@ export default function Chat() {
       </div>
 
       {/* Input */}
-      <form onSubmit={sendMessage} className="mt-3 flex gap-2">
-        <div className="flex-1 relative">
-          <Input
-            placeholder={dailyMsgCount >= 50 ? "Limite diário atingido" : "Digite sua mensagem..."}
-            value={newMsg}
-            onChange={e => setNewMsg(e.target.value)}
-            className="pr-3 rounded-xl border-border/60 bg-muted/30 focus-visible:ring-accent/30"
-            disabled={dailyMsgCount >= 50}
-          />
-        </div>
+      <form onSubmit={sendMessage} className="mt-4 flex gap-2">
+        <Input
+          placeholder={dailyMsgCount >= 50 ? "Limite atingido" : "Mensagem..."}
+          value={newMsg}
+          onChange={e => setNewMsg(e.target.value)}
+          className="border-0 border-b border-border rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-foreground transition-colors duration-150"
+          disabled={dailyMsgCount >= 50}
+        />
         <Button
           type="submit"
           size="icon"
-          className="rounded-xl shrink-0"
+          variant="ghost"
+          className="shrink-0 text-muted-foreground hover:text-foreground"
           disabled={!newMsg.trim() || dailyMsgCount >= 50 || sending}
         >
           <Send className="h-4 w-4" />

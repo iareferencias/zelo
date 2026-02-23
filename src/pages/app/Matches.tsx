@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, MapPin, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -63,9 +62,9 @@ export default function Matches() {
   if (loading) {
     return (
       <div className="page-transition">
-        <div className="mb-8">
-          <div className="skeleton-shimmer h-8 w-44 mb-2" />
-          <div className="skeleton-shimmer h-4 w-56" />
+        <div className="mb-10">
+          <div className="skeleton-shimmer h-7 w-36 mb-2" />
+          <div className="skeleton-shimmer h-4 w-48" />
         </div>
         <GridSkeleton count={3} />
       </div>
@@ -74,8 +73,8 @@ export default function Matches() {
 
   return (
     <div className="page-transition">
-      <div className="mb-8">
-        <h1 className="font-serif text-3xl font-semibold text-foreground tracking-tight">Seus Matches</h1>
+      <div className="mb-10">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">Matches</h1>
         <p className="mt-1 text-sm text-muted-foreground">Conexões com interesse mútuo</p>
       </div>
 
@@ -86,36 +85,34 @@ export default function Matches() {
           {matches.map((m, i) => (
             <motion.div
               key={m.matchId}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05, duration: 0.3 }}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.04, duration: 0.2 }}
             >
-              <Card className="card-hover border-border/60">
-                <CardContent className="p-5">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                      <User className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <h3 className="font-serif text-lg font-semibold text-foreground">{m.partnerName}</h3>
-                      {m.partnerCity && (
-                        <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                          <MapPin className="h-3 w-3" />{m.partnerCity}
-                        </p>
-                      )}
-                    </div>
+              <div className="rounded-xl border border-border bg-card p-6 card-hover">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                    <User className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <p className="mb-4 text-[11px] text-muted-foreground">Match em {m.createdAt}</p>
-                  <Button
-                    size="sm"
-                    className="w-full rounded-lg font-medium text-xs tracking-wide"
-                    onClick={() => navigate(`/app/chat/${m.matchId}`)}
-                  >
-                    <MessageCircle className="mr-2 h-3.5 w-3.5" />
-                    Conversar
-                  </Button>
-                </CardContent>
-              </Card>
+                  <div>
+                    <h3 className="text-sm font-semibold text-foreground">{m.partnerName}</h3>
+                    {m.partnerCity && (
+                      <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <MapPin className="h-3 w-3" />{m.partnerCity}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <p className="mb-4 text-[11px] text-muted-foreground">Match em {m.createdAt}</p>
+                <Button
+                  size="sm"
+                  className="w-full text-xs font-medium"
+                  onClick={() => navigate(`/app/chat/${m.matchId}`)}
+                >
+                  <MessageCircle className="mr-1.5 h-3.5 w-3.5" />
+                  Conversar
+                </Button>
+              </div>
             </motion.div>
           ))}
         </div>
