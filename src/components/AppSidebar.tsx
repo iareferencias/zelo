@@ -35,7 +35,12 @@ export function AppSidebar() {
     <Sidebar className="border-r border-border/50">
       <SidebarContent>
         <div className="p-4 pb-0">
-          <span className="font-serif text-xl font-bold tracking-widest text-foreground">ZELO</span>
+          <div className="flex items-center gap-2">
+            <span className="font-serif text-xl font-bold tracking-widest text-foreground">ZELO</span>
+            {isAdmin && (
+              <span className="rounded-full bg-accent/15 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-accent">Admin</span>
+            )}
+          </div>
           <p className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground">Área do membro</p>
         </div>
         <SidebarGroup>
