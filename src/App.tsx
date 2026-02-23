@@ -8,6 +8,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Waitlist from "./pages/Waitlist";
 import AppLayout from "./pages/app/AppLayout";
 import Compatibles from "./pages/app/Compatibles";
 import Matches from "./pages/app/Matches";
@@ -16,6 +17,7 @@ import Profile from "./pages/app/Profile";
 import Preparacao from "./pages/app/Preparacao";
 import AdminUsers from "./pages/app/admin/AdminUsers";
 import AdminReports from "./pages/app/admin/AdminReports";
+import AdminInvites from "./pages/app/admin/AdminInvites";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +33,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/waitlist" element={<Waitlist />} />
             <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route index element={<Compatibles />} />
               <Route path="matches" element={<Matches />} />
@@ -39,6 +42,7 @@ const App = () => (
               <Route path="preparacao" element={<Preparacao />} />
               <Route path="admin/users" element={<AdminUsers />} />
               <Route path="admin/reports" element={<AdminReports />} />
+              <Route path="admin/invites" element={<AdminInvites />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

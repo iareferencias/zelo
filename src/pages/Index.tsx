@@ -66,8 +66,8 @@ const Index = () => {
             custom={3}
           >
             <Button size="lg" className="bg-accent text-accent-foreground hover:bg-gold-dark font-sans text-sm tracking-wider rounded-full px-10 py-6 shadow-md shadow-accent/20" asChild>
-              <Link to="/signup">
-                Começar agora
+              <Link to="/waitlist">
+                Solicitar convite
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -254,8 +254,8 @@ const Index = () => {
               Entre pra uma comunidade que valoriza o que você valoriza.
             </p>
             <Button size="lg" className="bg-accent text-accent-foreground hover:bg-gold-dark font-sans text-sm tracking-wider rounded-full px-10 py-6 shadow-md shadow-accent/20" asChild>
-              <Link to="/signup">
-                Criar minha conta
+              <Link to="/waitlist">
+                Solicitar convite
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

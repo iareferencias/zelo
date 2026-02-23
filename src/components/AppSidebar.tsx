@@ -1,4 +1,4 @@
-import { Users, Heart, BookOpen, User, Shield, LogOut } from "lucide-react";
+import { Users, Heart, BookOpen, User, Shield, LogOut, Ticket } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -73,6 +73,14 @@ export function AppSidebar() {
                     <NavLink to="/app/admin/reports" className="hover:bg-muted/50" activeClassName="bg-muted text-accent font-medium">
                       <Shield className="mr-2 h-4 w-4" />
                       <span>Denúncias</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <NavLink to="/app/admin/invites" className="hover:bg-muted/50" activeClassName="bg-muted text-accent font-medium">
+                      <Ticket className="mr-2 h-4 w-4" />
+                      <span>Convites</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
