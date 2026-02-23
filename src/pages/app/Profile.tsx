@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
 
 export default function Profile() {
   const { user } = useAuth();
@@ -71,42 +72,58 @@ export default function Profile() {
     if (error) {
       toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Perfil atualizado!" });
+      toast({ title: "✓ Perfil atualizado" });
     }
   }
 
-  if (loading) return <div className="text-center text-muted-foreground">Carregando...</div>;
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-2xl page-transition">
+        <div className="skeleton-shimmer h-8 w-36 mb-6" />
+        <div className="rounded-xl border border-border bg-card p-6 space-y-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="skeleton-shimmer h-10 w-full rounded-lg" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <h1 className="mb-6 font-serif text-3xl font-semibold text-foreground">Meu Perfil</h1>
-      <Card>
+    <motion.div
+      className="mx-auto max-w-2xl page-transition"
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <h1 className="mb-6 font-serif text-3xl font-semibold text-foreground tracking-tight">Meu Perfil</h1>
+      <Card className="border-border/60">
         <CardHeader>
           <CardTitle className="font-serif text-lg">Informações pessoais</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSave} className="space-y-4">
+          <form onSubmit={handleSave} className="space-y-5">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label>Nome completo *</Label>
-                <Input value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} required />
+                <Label className="text-xs font-medium text-muted-foreground">Nome completo *</Label>
+                <Input value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} required className="border-border/60" />
               </div>
               <div className="space-y-2">
-                <Label>Idade</Label>
-                <Input type="number" min={18} max={99} value={form.age} onChange={e => setForm(f => ({ ...f, age: e.target.value }))} />
+                <Label className="text-xs font-medium text-muted-foreground">Idade</Label>
+                <Input type="number" min={18} max={99} value={form.age} onChange={e => setForm(f => ({ ...f, age: e.target.value }))} className="border-border/60" />
               </div>
               <div className="space-y-2">
-                <Label>Cidade</Label>
-                <Input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} />
+                <Label className="text-xs font-medium text-muted-foreground">Cidade</Label>
+                <Input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} className="border-border/60" />
               </div>
               <div className="space-y-2">
-                <Label>Congregação</Label>
-                <Input value={form.congregation} onChange={e => setForm(f => ({ ...f, congregation: e.target.value }))} />
+                <Label className="text-xs font-medium text-muted-foreground">Congregação</Label>
+                <Input value={form.congregation} onChange={e => setForm(f => ({ ...f, congregation: e.target.value }))} className="border-border/60" />
               </div>
               <div className="space-y-2">
-                <Label>Gênero</Label>
+                <Label className="text-xs font-medium text-muted-foreground">Gênero</Label>
                 <Select value={form.gender} onValueChange={v => setForm(f => ({ ...f, gender: v }))}>
-                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectTrigger className="border-border/60"><SelectValue placeholder="Selecione" /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="masculino">Masculino</SelectItem>
                     <SelectItem value="feminino">Feminino</SelectItem>
@@ -115,12 +132,13 @@ export default function Profile() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Testemunho</Label>
+              <Label className="text-xs font-medium text-muted-foreground">Testemunho</Label>
               <Textarea
                 rows={4}
                 value={form.testimony}
                 onChange={e => setForm(f => ({ ...f, testimony: e.target.value }))}
                 placeholder="Compartilhe um pouco da sua caminhada de fé..."
+                className="border-border/60 resize-none"
               />
             </div>
             <div className="flex flex-col gap-3">
@@ -141,12 +159,12 @@ export default function Profile() {
                 <Label htmlFor="children" className="text-sm">Desejo ter filhos</Label>
               </div>
             </div>
-            <Button type="submit" disabled={saving} className="w-full">
+            <Button type="submit" disabled={saving} className="w-full rounded-lg font-medium text-sm tracking-wide">
               {saving ? "Salvando..." : "Salvar perfil"}
             </Button>
           </form>
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 }

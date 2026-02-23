@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, MapPin, Church, Sparkles } from "lucide-react";
+import { Heart, MapPin, Church, Sparkles, User } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
+import { EmptyState } from "@/components/EmptyState";
+import { GridSkeleton } from "@/components/Skeletons";
 
 interface ProfileWithScore {
   id: string;
@@ -85,14 +88,12 @@ export default function Compatibles() {
       return;
     }
 
-    // Send notification to liked user
     await supabase.from("notifications").insert({
       user_id: toUser,
       type: "like_received",
       reference_id: user.id,
     } as any);
 
-    // Check for mutual like → create match
     const { data: mutual } = await supabase
       .from("likes")
       .select("id")
@@ -104,7 +105,6 @@ export default function Compatibles() {
       const [a, b] = [user.id, toUser].sort();
       const { data: match } = await supabase.from("matches").insert({ user_a: a, user_b: b }).select("id").single();
       
-      // Notify both users about match
       await supabase.from("notifications").insert([
         { user_id: user.id, type: "match_created", reference_id: match?.id },
         { user_id: toUser, type: "match_created", reference_id: match?.id },
@@ -112,7 +112,7 @@ export default function Compatibles() {
       
       toast({ title: "🎉 Match criado!", description: "Vocês demonstraram interesse mútuo." });
     } else {
-      toast({ title: "Interesse demonstrado" });
+      toast({ title: "💛 Interesse demonstrado", description: "Aguardando reciprocidade." });
     }
 
     setLikedIds(prev => new Set(prev).add(toUser));
@@ -120,69 +120,119 @@ export default function Compatibles() {
   }
 
   function scoreColor(score: number) {
-    if (score >= 70) return "text-green-600 bg-green-50 border-green-200";
-    if (score >= 40) return "text-amber-600 bg-amber-50 border-amber-200";
+    if (score >= 70) return "text-accent bg-accent/10 border-accent/20";
+    if (score >= 40) return "text-muted-foreground bg-muted border-border";
     return "text-muted-foreground bg-muted border-border";
   }
 
-  if (loading) return <div className="text-center text-muted-foreground py-12">Carregando perfis...</div>;
+  if (loading) {
+    return (
+      <div className="page-transition">
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <div className="skeleton-shimmer h-8 w-56 mb-2" />
+            <div className="skeleton-shimmer h-4 w-36" />
+          </div>
+          <div className="skeleton-shimmer h-9 w-36 rounded-full" />
+        </div>
+        <GridSkeleton count={6} />
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <div className="mb-6 flex items-center justify-between">
+    <div className="page-transition">
+      <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="font-serif text-3xl font-semibold text-foreground">Perfis Compatíveis</h1>
-          <p className="text-sm text-muted-foreground">Ordenados por compatibilidade</p>
+          <h1 className="font-serif text-3xl font-semibold text-foreground tracking-tight">Perfis Compatíveis</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Ordenados por compatibilidade</p>
         </div>
-        <div className="rounded-full bg-muted px-4 py-2 text-sm font-medium text-muted-foreground">
-          {todayLikes}/3 interesses hoje
+        <div className="rounded-full border border-border bg-card px-4 py-2 text-xs font-medium text-muted-foreground">
+          <span className="text-foreground font-semibold">{todayLikes}</span>/3 interesses hoje
         </div>
       </div>
 
       {profiles.length === 0 ? (
-        <p className="text-center text-muted-foreground mt-12">Nenhum perfil compatível encontrado no momento.</p>
+        <EmptyState type="compatibles" />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {profiles.map(p => (
-            <Card key={p.id} className="transition-all hover:shadow-lg hover:border-accent/30">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <CardTitle className="font-serif text-lg">{p.full_name || "Sem nome"}</CardTitle>
-                  <div className={`flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-bold ${scoreColor(p.score)}`}>
-                    <Sparkles className="h-3 w-3" />
-                    {p.score}%
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {profiles.map((p, i) => (
+            <motion.div
+              key={p.id}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05, duration: 0.3 }}
+            >
+              <Card className="card-hover overflow-hidden border-border/60">
+                <CardContent className="p-5 space-y-4">
+                  {/* Header with avatar placeholder + score */}
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-muted">
+                      <User className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <h3 className="font-serif text-lg font-semibold text-foreground leading-tight truncate">
+                            {p.full_name || "Sem nome"}
+                          </h3>
+                          <div className="flex flex-wrap items-center gap-2 mt-0.5 text-xs text-muted-foreground">
+                            {p.age && <span>{p.age} anos</span>}
+                            {p.city && (
+                              <span className="flex items-center gap-0.5">
+                                <MapPin className="h-3 w-3" />{p.city}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className={`flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-bold shrink-0 ${scoreColor(p.score)}`}>
+                          <Sparkles className="h-3 w-3" />
+                          {p.score}%
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-                  {p.age && <span>{p.age} anos</span>}
-                  {p.city && <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{p.city}</span>}
-                  {p.congregation && <span className="flex items-center gap-1"><Church className="h-3 w-3" />{p.congregation}</span>}
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {p.reasons.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5">
-                    {p.reasons.slice(0, 3).map((r, i) => (
-                      <span key={i} className="rounded-full bg-accent/10 px-2.5 py-1 text-[11px] font-medium text-accent">
-                        {r}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                {p.testimony && (
-                  <p className="text-sm text-muted-foreground line-clamp-2">{p.testimony}</p>
-                )}
-                <Button
-                  size="sm"
-                  className="w-full"
-                  disabled={likedIds.has(p.id) || todayLikes >= 3}
-                  onClick={() => handleLike(p.id)}
-                >
-                  <Heart className="mr-2 h-4 w-4" />
-                  {likedIds.has(p.id) ? "Interesse demonstrado" : "Demonstrar interesse"}
-                </Button>
-              </CardContent>
-            </Card>
+
+                  {/* Congregation */}
+                  {p.congregation && (
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Church className="h-3.5 w-3.5" />
+                      <span>{p.congregation}</span>
+                    </div>
+                  )}
+
+                  {/* Reason chips */}
+                  {p.reasons.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {p.reasons.slice(0, 3).map((r, idx) => (
+                        <span key={idx} className="rounded-full bg-accent/8 border border-accent/15 px-2.5 py-0.5 text-[11px] font-medium text-accent">
+                          {r}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Testimony preview */}
+                  {p.testimony && (
+                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                      "{p.testimony}"
+                    </p>
+                  )}
+
+                  {/* CTA */}
+                  <Button
+                    size="sm"
+                    className="w-full rounded-lg font-medium text-xs tracking-wide"
+                    variant={likedIds.has(p.id) ? "outline" : "default"}
+                    disabled={likedIds.has(p.id) || todayLikes >= 3}
+                    onClick={() => handleLike(p.id)}
+                  >
+                    <Heart className={`mr-2 h-3.5 w-3.5 ${likedIds.has(p.id) ? "fill-accent text-accent" : ""}`} />
+                    {likedIds.has(p.id) ? "Interesse demonstrado" : "Demonstrar interesse"}
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
       )}
