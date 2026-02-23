@@ -336,6 +336,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      compute_match_score: {
+        Args: { candidate_id: string; viewer_id: string }
+        Returns: {
+          reasons: string[]
+          score: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
