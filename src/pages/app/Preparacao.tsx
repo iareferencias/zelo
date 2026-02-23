@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Heart, Users, Home, MessageCircle, Shield } from "lucide-react";
+import { motion } from "framer-motion";
 
 const topics = [
   {
@@ -36,22 +37,31 @@ const topics = [
 
 export default function Preparacao() {
   return (
-    <div>
-      <h1 className="mb-2 font-serif text-3xl font-semibold text-foreground">Preparação para o Casamento</h1>
-      <p className="mb-8 text-sm text-muted-foreground">Conteúdos para edificar sua jornada</p>
+    <div className="page-transition">
+      <div className="mb-8">
+        <h1 className="font-serif text-3xl font-semibold text-foreground tracking-tight">Preparação para o Casamento</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Conteúdos para edificar sua jornada</p>
+      </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {topics.map(t => (
-          <Card key={t.title} className="transition-all hover:shadow-lg hover:border-accent/30">
-            <CardHeader>
-              <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-accent/10">
-                <t.icon className="h-5 w-5 text-accent" />
-              </div>
-              <CardTitle className="font-serif text-lg">{t.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground leading-relaxed">{t.desc}</p>
-            </CardContent>
-          </Card>
+        {topics.map((t, i) => (
+          <motion.div
+            key={t.title}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05, duration: 0.3 }}
+          >
+            <Card className="card-hover border-border/60 h-full">
+              <CardHeader>
+                <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10">
+                  <t.icon className="h-5 w-5 text-accent" />
+                </div>
+                <CardTitle className="font-serif text-lg">{t.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground leading-relaxed">{t.desc}</p>
+              </CardContent>
+            </Card>
+          </motion.div>
         ))}
       </div>
     </div>

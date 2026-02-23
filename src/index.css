@@ -4,89 +4,89 @@
 
 @layer base {
   :root {
-    --background: 40 30% 98%;
-    --foreground: 222 30% 18%;
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
 
-    --card: 40 20% 99%;
-    --card-foreground: 222 30% 18%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 30% 18%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 222 40% 28%;
-    --primary-foreground: 40 30% 96%;
+    --primary: 222 47% 11%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 40 20% 95%;
-    --secondary-foreground: 222 30% 18%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 40 15% 94%;
-    --muted-foreground: 220 10% 46%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
 
-    --accent: 30 60% 58%;
-    --accent-foreground: 222 40% 10%;
+    --accent: 40 52% 57%;
+    --accent-foreground: 222 47% 11%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 40 15% 90%;
-    --input: 40 15% 90%;
-    --ring: 30 60% 58%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 40 52% 57%;
 
     --radius: 0.75rem;
 
-    --gold: 30 60% 58%;
-    --gold-light: 35 50% 78%;
-    --gold-dark: 28 55% 42%;
-    --navy: 222 40% 28%;
-    --navy-light: 222 35% 38%;
+    --gold: 40 52% 57%;
+    --gold-light: 42 40% 76%;
+    --gold-dark: 38 48% 42%;
+    --navy: 222 47% 11%;
+    --navy-light: 217 33% 17%;
 
-    --sidebar-background: 40 20% 97%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-background: 220 14% 97%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 222 47% 11%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 40 15% 91%;
-    --sidebar-ring: 30 60% 58%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 40 52% 57%;
   }
 
   .dark {
-    --background: 222 84% 5%;
+    --background: 222 47% 5%;
     --foreground: 210 40% 98%;
 
-    --card: 222 60% 8%;
+    --card: 222 47% 7%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222 60% 8%;
+    --popover: 222 47% 7%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 45 50% 90%;
-    --primary-foreground: 222 84% 11%;
+    --primary: 42 40% 88%;
+    --primary-foreground: 222 47% 7%;
 
-    --secondary: 222 40% 15%;
+    --secondary: 217 33% 12%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 222 40% 15%;
+    --muted: 217 33% 12%;
     --muted-foreground: 215 20% 65%;
 
-    --accent: 43 50% 55%;
-    --accent-foreground: 222 84% 5%;
+    --accent: 40 45% 52%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 222 40% 15%;
-    --input: 222 40% 15%;
-    --ring: 43 50% 55%;
+    --border: 217 33% 14%;
+    --input: 217 33% 14%;
+    --ring: 40 45% 52%;
 
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 222 47% 6%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 42 40% 88%;
+    --sidebar-primary-foreground: 222 47% 7%;
+    --sidebar-accent: 217 33% 12%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 14%;
+    --sidebar-ring: 40 45% 52%;
   }
 }
 
@@ -102,5 +102,19 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Cormorant Garamond', serif;
+  }
+}
+
+@layer components {
+  .page-transition {
+    @apply animate-fade-in;
+  }
+
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-md hover:shadow-accent/5 hover:-translate-y-0.5;
+  }
+
+  .skeleton-shimmer {
+    @apply animate-pulse rounded-lg bg-muted;
   }
 }

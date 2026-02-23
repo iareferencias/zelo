@@ -14,7 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Message {
   id: string;
@@ -43,8 +43,8 @@ function PrayerGate({ onProceed }: { onProceed: () => void }) {
         transition={{ duration: 0.5 }}
         className="mx-auto max-w-md text-center px-6"
       >
-        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-accent/10">
-          <Heart className="h-8 w-8 text-accent" />
+        <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-accent/10">
+          <Heart className="h-7 w-7 text-accent" />
         </div>
         <h2 className="mb-3 font-serif text-2xl font-semibold text-foreground">
           Momento de oração
@@ -55,7 +55,7 @@ function PrayerGate({ onProceed }: { onProceed: () => void }) {
         </p>
         <Button
           size="lg"
-          className="rounded-full px-8"
+          className="rounded-full px-8 font-medium text-sm tracking-wide"
           onClick={onProceed}
         >
           Prosseguir com respeito
@@ -77,9 +77,9 @@ export default function Chat() {
   const [gateLoading, setGateLoading] = useState(true);
   const [hasPrayed, setHasPrayed] = useState(false);
   const [dailyMsgCount, setDailyMsgCount] = useState(0);
+  const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Check prayer gate
   useEffect(() => {
     if (!matchId || !user) return;
     (async () => {
@@ -94,7 +94,6 @@ export default function Chat() {
     })();
   }, [matchId, user]);
 
-  // Load daily message count
   useEffect(() => {
     if (!user) return;
     (async () => {
@@ -166,9 +165,8 @@ export default function Chat() {
 
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault();
-    if (!newMsg.trim() || !matchId || !user) return;
+    if (!newMsg.trim() || !matchId || !user || sending) return;
 
-    // Check daily message limit
     if (dailyMsgCount >= 50) {
       toast({
         title: "Limite de mensagens atingido",
@@ -178,16 +176,17 @@ export default function Chat() {
       return;
     }
 
+    setSending(true);
     const filtered = filterMessage(newMsg);
+    setNewMsg("");
+
     await supabase.from("messages").insert({ match_id: matchId, sender_id: user.id, body: filtered });
 
-    // Update daily message count
     setDailyMsgCount(prev => prev + 1);
     await supabase.from("profiles").update({
       daily_message_count: dailyMsgCount + 1,
     }).eq("id", user.id);
 
-    // Send notification to partner
     if (partnerId) {
       await supabase.from("notifications").insert({
         user_id: partnerId,
@@ -196,7 +195,7 @@ export default function Chat() {
       } as any);
     }
 
-    setNewMsg("");
+    setSending(false);
   }
 
   async function submitReport() {
@@ -224,16 +223,22 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] flex-col">
+    <div className="page-transition flex h-[calc(100vh-8rem)] flex-col">
+      {/* Chat header */}
       <div className="flex items-center justify-between border-b border-border/50 pb-3 mb-3">
-        <div>
-          <h2 className="font-serif text-xl font-semibold text-foreground">{partnerName}</h2>
-          <p className="text-xs text-muted-foreground">Chat privado • {dailyMsgCount}/50 mensagens hoje</p>
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground text-xs font-semibold">
+            {partnerName.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <h2 className="font-serif text-lg font-semibold text-foreground leading-tight">{partnerName}</h2>
+            <p className="text-[11px] text-muted-foreground">{dailyMsgCount}/50 mensagens hoje</p>
+          </div>
         </div>
         <Dialog open={reportOpen} onOpenChange={setReportOpen}>
           <DialogTrigger asChild>
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
-              <Flag className="mr-1 h-4 w-4" />
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive text-xs">
+              <Flag className="mr-1 h-3.5 w-3.5" />
               Denunciar
             </Button>
           </DialogTrigger>
@@ -251,33 +256,52 @@ export default function Chat() {
         </Dialog>
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-2 pr-2">
-        {messages.map(m => (
-          <div key={m.id} className={`flex ${m.sender_id === user?.id ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[75%] rounded-lg px-4 py-2 text-sm ${
-              m.sender_id === user?.id
-                ? "bg-accent text-accent-foreground"
-                : "bg-muted text-foreground"
-            }`}>
-              {m.body}
-              <div className="mt-1 text-[10px] opacity-60">
-                {new Date(m.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto space-y-1.5 pr-2 scroll-smooth">
+        <AnimatePresence initial={false}>
+          {messages.map(m => (
+            <motion.div
+              key={m.id}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+              className={`flex ${m.sender_id === user?.id ? "justify-end" : "justify-start"}`}
+            >
+              <div className={`max-w-[70%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                m.sender_id === user?.id
+                  ? "bg-primary text-primary-foreground rounded-br-md"
+                  : "bg-muted text-foreground rounded-bl-md"
+              }`}>
+                {m.body}
+                <div className={`mt-1 text-[10px] ${
+                  m.sender_id === user?.id ? "text-primary-foreground/50" : "text-muted-foreground/60"
+                }`}>
+                  {new Date(m.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                </div>
               </div>
-            </div>
-          </div>
-        ))}
+            </motion.div>
+          ))}
+        </AnimatePresence>
         <div ref={bottomRef} />
       </div>
 
+      {/* Input */}
       <form onSubmit={sendMessage} className="mt-3 flex gap-2">
-        <Input
-          placeholder={dailyMsgCount >= 50 ? "Limite diário atingido" : "Digite sua mensagem..."}
-          value={newMsg}
-          onChange={e => setNewMsg(e.target.value)}
-          className="flex-1"
-          disabled={dailyMsgCount >= 50}
-        />
-        <Button type="submit" size="icon" disabled={!newMsg.trim() || dailyMsgCount >= 50}>
+        <div className="flex-1 relative">
+          <Input
+            placeholder={dailyMsgCount >= 50 ? "Limite diário atingido" : "Digite sua mensagem..."}
+            value={newMsg}
+            onChange={e => setNewMsg(e.target.value)}
+            className="pr-3 rounded-xl border-border/60 bg-muted/30 focus-visible:ring-accent/30"
+            disabled={dailyMsgCount >= 50}
+          />
+        </div>
+        <Button
+          type="submit"
+          size="icon"
+          className="rounded-xl shrink-0"
+          disabled={!newMsg.trim() || dailyMsgCount >= 50 || sending}
+        >
           <Send className="h-4 w-4" />
         </Button>
       </form>
