@@ -164,6 +164,10 @@ export type Database = {
           gender: string | null
           id: string
           marriage_intent: boolean | null
+          onboarding_completed: boolean
+          participation_tags: string[] | null
+          show_congregation: boolean
+          show_photo: boolean
           testimony: string | null
           updated_at: string | null
           wants_children: boolean | null
@@ -179,6 +183,10 @@ export type Database = {
           gender?: string | null
           id: string
           marriage_intent?: boolean | null
+          onboarding_completed?: boolean
+          participation_tags?: string[] | null
+          show_congregation?: boolean
+          show_photo?: boolean
           testimony?: string | null
           updated_at?: string | null
           wants_children?: boolean | null
@@ -194,6 +202,10 @@ export type Database = {
           gender?: string | null
           id?: string
           marriage_intent?: boolean | null
+          onboarding_completed?: boolean
+          participation_tags?: string[] | null
+          show_congregation?: boolean
+          show_photo?: boolean
           testimony?: string | null
           updated_at?: string | null
           wants_children?: boolean | null

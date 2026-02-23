@@ -18,6 +18,7 @@ import Preparacao from "./pages/app/Preparacao";
 import AdminUsers from "./pages/app/admin/AdminUsers";
 import AdminReports from "./pages/app/admin/AdminReports";
 import AdminInvites from "./pages/app/admin/AdminInvites";
+import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/waitlist" element={<Waitlist />} />
+            <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route index element={<Compatibles />} />
               <Route path="matches" element={<Matches />} />
