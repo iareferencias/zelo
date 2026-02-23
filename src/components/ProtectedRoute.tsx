@@ -11,7 +11,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("onboarding_completed")
+        .select("onboarding_completed, banned_until")
         .eq("id", user!.id)
         .single();
       return data;
@@ -28,6 +28,12 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) return <Navigate to="/login" replace />;
+
+  // Ban check
+  if (profile?.banned_until && new Date(profile.banned_until) > new Date()) {
+    return <Navigate to="/banned" replace />;
+  }
+
   if (profile && !profile.onboarding_completed) return <Navigate to="/onboarding" replace />;
   return <>{children}</>;
 }

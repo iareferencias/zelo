@@ -76,6 +76,7 @@ export default function Chat() {
   const [reportOpen, setReportOpen] = useState(false);
   const [gateLoading, setGateLoading] = useState(true);
   const [hasPrayed, setHasPrayed] = useState(false);
+  const [dailyMsgCount, setDailyMsgCount] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   // Check prayer gate
@@ -92,6 +93,27 @@ export default function Chat() {
       setGateLoading(false);
     })();
   }, [matchId, user]);
+
+  // Load daily message count
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("daily_message_count, last_like_reset")
+        .eq("id", user.id)
+        .single();
+      if (data) {
+        const lastReset = new Date(data.last_like_reset);
+        const now = new Date();
+        if (lastReset.toDateString() !== now.toDateString()) {
+          setDailyMsgCount(0);
+        } else {
+          setDailyMsgCount(data.daily_message_count || 0);
+        }
+      }
+    })();
+  }, [user]);
 
   useEffect(() => {
     if (!matchId || !user || !hasPrayed) return;
@@ -114,7 +136,6 @@ export default function Chat() {
 
   async function handleProceed() {
     if (!matchId || !user) return;
-    // Upsert gate record
     await supabase.from("match_gate").upsert({
       match_id: matchId,
       user_id: user.id,
@@ -146,8 +167,35 @@ export default function Chat() {
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault();
     if (!newMsg.trim() || !matchId || !user) return;
+
+    // Check daily message limit
+    if (dailyMsgCount >= 50) {
+      toast({
+        title: "Limite de mensagens atingido",
+        description: "Você pode enviar até 50 mensagens por dia.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const filtered = filterMessage(newMsg);
     await supabase.from("messages").insert({ match_id: matchId, sender_id: user.id, body: filtered });
+
+    // Update daily message count
+    setDailyMsgCount(prev => prev + 1);
+    await supabase.from("profiles").update({
+      daily_message_count: dailyMsgCount + 1,
+    }).eq("id", user.id);
+
+    // Send notification to partner
+    if (partnerId) {
+      await supabase.from("notifications").insert({
+        user_id: partnerId,
+        type: "new_message",
+        reference_id: matchId as string,
+      } as any);
+    }
+
     setNewMsg("");
   }
 
@@ -180,7 +228,7 @@ export default function Chat() {
       <div className="flex items-center justify-between border-b border-border/50 pb-3 mb-3">
         <div>
           <h2 className="font-serif text-xl font-semibold text-foreground">{partnerName}</h2>
-          <p className="text-xs text-muted-foreground">Chat privado</p>
+          <p className="text-xs text-muted-foreground">Chat privado • {dailyMsgCount}/50 mensagens hoje</p>
         </div>
         <Dialog open={reportOpen} onOpenChange={setReportOpen}>
           <DialogTrigger asChild>
@@ -223,12 +271,13 @@ export default function Chat() {
 
       <form onSubmit={sendMessage} className="mt-3 flex gap-2">
         <Input
-          placeholder="Digite sua mensagem..."
+          placeholder={dailyMsgCount >= 50 ? "Limite diário atingido" : "Digite sua mensagem..."}
           value={newMsg}
           onChange={e => setNewMsg(e.target.value)}
           className="flex-1"
+          disabled={dailyMsgCount >= 50}
         />
-        <Button type="submit" size="icon" disabled={!newMsg.trim()}>
+        <Button type="submit" size="icon" disabled={!newMsg.trim() || dailyMsgCount >= 50}>
           <Send className="h-4 w-4" />
         </Button>
       </form>
