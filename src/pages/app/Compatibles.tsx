@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Heart, MapPin, Church, Sparkles, User } from "lucide-react";
+import { Heart, MapPin, User } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { EmptyState } from "@/components/EmptyState";
@@ -110,30 +109,21 @@ export default function Compatibles() {
         { user_id: toUser, type: "match_created", reference_id: match?.id },
       ] as any);
       
-      toast({ title: "🎉 Match criado!", description: "Vocês demonstraram interesse mútuo." });
+      toast({ title: "Match criado", description: "Vocês demonstraram interesse mútuo." });
     } else {
-      toast({ title: "💛 Interesse demonstrado", description: "Aguardando reciprocidade." });
+      toast({ title: "Interesse demonstrado", description: "Aguardando reciprocidade." });
     }
 
     setLikedIds(prev => new Set(prev).add(toUser));
     setTodayLikes(prev => prev + 1);
   }
 
-  function scoreColor(score: number) {
-    if (score >= 70) return "text-accent bg-accent/10 border-accent/20";
-    if (score >= 40) return "text-muted-foreground bg-muted border-border";
-    return "text-muted-foreground bg-muted border-border";
-  }
-
   if (loading) {
     return (
       <div className="page-transition">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <div className="skeleton-shimmer h-8 w-56 mb-2" />
-            <div className="skeleton-shimmer h-4 w-36" />
-          </div>
-          <div className="skeleton-shimmer h-9 w-36 rounded-full" />
+        <div className="mb-10">
+          <div className="skeleton-shimmer h-7 w-48 mb-2" />
+          <div className="skeleton-shimmer h-4 w-32" />
         </div>
         <GridSkeleton count={6} />
       </div>
@@ -142,96 +132,81 @@ export default function Compatibles() {
 
   return (
     <div className="page-transition">
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-10 flex items-end justify-between">
         <div>
-          <h1 className="font-serif text-3xl font-semibold text-foreground tracking-tight">Perfis Compatíveis</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Compatíveis</h1>
           <p className="mt-1 text-sm text-muted-foreground">Ordenados por compatibilidade</p>
         </div>
-        <div className="rounded-full border border-border bg-card px-4 py-2 text-xs font-medium text-muted-foreground">
-          <span className="text-foreground font-semibold">{todayLikes}</span>/3 interesses hoje
-        </div>
+        <span className="text-xs text-muted-foreground">
+          <span className="font-medium text-foreground">{todayLikes}</span>/3 hoje
+        </span>
       </div>
 
       {profiles.length === 0 ? (
         <EmptyState type="compatibles" />
       ) : (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {profiles.map((p, i) => (
             <motion.div
               key={p.id}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05, duration: 0.3 }}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.04, duration: 0.2 }}
             >
-              <Card className="card-hover overflow-hidden border-border/60">
-                <CardContent className="p-5 space-y-4">
-                  {/* Header with avatar placeholder + score */}
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-muted">
-                      <User className="h-5 w-5 text-muted-foreground" />
+              <div className="rounded-xl border border-border bg-card p-6 card-hover">
+                {/* Header */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                      <User className="h-4 w-4 text-muted-foreground" />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <h3 className="font-serif text-lg font-semibold text-foreground leading-tight truncate">
-                            {p.full_name || "Sem nome"}
-                          </h3>
-                          <div className="flex flex-wrap items-center gap-2 mt-0.5 text-xs text-muted-foreground">
-                            {p.age && <span>{p.age} anos</span>}
-                            {p.city && (
-                              <span className="flex items-center gap-0.5">
-                                <MapPin className="h-3 w-3" />{p.city}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div className={`flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-bold shrink-0 ${scoreColor(p.score)}`}>
-                          <Sparkles className="h-3 w-3" />
-                          {p.score}%
-                        </div>
+                    <div>
+                      <h3 className="text-sm font-semibold text-foreground leading-tight">
+                        {p.full_name || "Sem nome"}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
+                        {p.age && <span>{p.age}</span>}
+                        {p.city && (
+                          <span className="flex items-center gap-0.5">
+                            <MapPin className="h-3 w-3" />{p.city}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
+                  <span className="text-xs font-medium text-muted-foreground">{p.score}%</span>
+                </div>
 
-                  {/* Congregation */}
-                  {p.congregation && (
-                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Church className="h-3.5 w-3.5" />
-                      <span>{p.congregation}</span>
-                    </div>
-                  )}
+                {/* Reasons */}
+                {p.reasons.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {p.reasons.slice(0, 3).map((r, idx) => (
+                      <span key={idx} className="rounded-full border border-border px-2.5 py-0.5 text-[11px] text-muted-foreground">
+                        {r}
+                      </span>
+                    ))}
+                  </div>
+                )}
 
-                  {/* Reason chips */}
-                  {p.reasons.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {p.reasons.slice(0, 3).map((r, idx) => (
-                        <span key={idx} className="rounded-full bg-accent/8 border border-accent/15 px-2.5 py-0.5 text-[11px] font-medium text-accent">
-                          {r}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                {/* Testimony */}
+                {p.testimony && (
+                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-4">
+                    {p.testimony}
+                  </p>
+                )}
 
-                  {/* Testimony preview */}
-                  {p.testimony && (
-                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                      "{p.testimony}"
-                    </p>
-                  )}
-
-                  {/* CTA */}
-                  <Button
-                    size="sm"
-                    className="w-full rounded-lg font-medium text-xs tracking-wide"
-                    variant={likedIds.has(p.id) ? "outline" : "default"}
-                    disabled={likedIds.has(p.id) || todayLikes >= 3}
-                    onClick={() => handleLike(p.id)}
-                  >
-                    <Heart className={`mr-2 h-3.5 w-3.5 ${likedIds.has(p.id) ? "fill-accent text-accent" : ""}`} />
-                    {likedIds.has(p.id) ? "Interesse demonstrado" : "Demonstrar interesse"}
-                  </Button>
-                </CardContent>
-              </Card>
+                {/* CTA */}
+                <Button
+                  size="sm"
+                  variant={likedIds.has(p.id) ? "outline" : "default"}
+                  className="w-full text-xs font-medium"
+                  disabled={likedIds.has(p.id) || todayLikes >= 3}
+                  onClick={() => handleLike(p.id)}
+                >
+                  <Heart className={`mr-1.5 h-3.5 w-3.5 ${likedIds.has(p.id) ? "fill-current" : ""}`} />
+                  {likedIds.has(p.id) ? "Interesse demonstrado" : "Demonstrar interesse"}
+                </Button>
+              </div>
             </motion.div>
           ))}
         </div>
