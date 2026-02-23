@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Shield, Heart, Users, MessageCircle, Lock, CheckCircle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
@@ -18,8 +19,8 @@ const Index = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
         <div className="container mx-auto flex items-center justify-between py-4 px-6">
           <span className="font-serif text-2xl font-bold tracking-widest text-primary">ZELO</span>
-          <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground font-sans text-xs tracking-wider uppercase">
-            Solicitar Convite
+          <Button variant="outline" size="sm" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground font-sans text-xs tracking-wider uppercase" asChild>
+            <Link to="/signup">Solicitar Convite</Link>
           </Button>
         </div>
       </nav>
@@ -67,9 +68,11 @@ const Index = () => {
             variants={fadeUp}
             custom={3}
           >
-            <Button size="lg" className="bg-accent text-accent-foreground hover:bg-gold-dark font-sans text-sm tracking-wider uppercase px-10 py-6">
-              Solicitar Convite
-              <ArrowRight className="ml-2 h-4 w-4" />
+            <Button size="lg" className="bg-accent text-accent-foreground hover:bg-gold-dark font-sans text-sm tracking-wider uppercase px-10 py-6" asChild>
+              <Link to="/signup">
+                Solicitar Convite
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
             </Button>
           </motion.div>
         </div>
@@ -240,9 +243,11 @@ const Index = () => {
             <p className="mx-auto mb-10 max-w-xl font-sans text-lg text-muted-foreground">
               Um passo de fé em direção ao propósito que Deus tem para a sua vida.
             </p>
-            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-navy-light font-sans text-sm tracking-wider uppercase px-10 py-6">
-              Solicitar Convite
-              <ArrowRight className="ml-2 h-4 w-4" />
+            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-navy-light font-sans text-sm tracking-wider uppercase px-10 py-6" asChild>
+              <Link to="/signup">
+                Solicitar Convite
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
             </Button>
           </motion.div>
         </div>
