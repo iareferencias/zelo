@@ -77,6 +77,38 @@ export type Database = {
           },
         ]
       }
+      match_gate: {
+        Row: {
+          created_at: string
+          id: string
+          match_id: string
+          prayed: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          match_id: string
+          prayed?: boolean
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          match_id?: string
+          prayed?: boolean
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_gate_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       matches: {
         Row: {
           created_at: string | null
