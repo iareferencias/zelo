@@ -5,8 +5,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Ban, AlertTriangle, ShieldCheck } from "lucide-react";
+import { CheckCircle, XCircle, Ban, AlertTriangle, ShieldCheck, Pencil, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import {
   Dialog,
   DialogContent,
@@ -33,6 +45,8 @@ export default function AdminUsers() {
   const [loading, setLoading] = useState(true);
   const [banDays, setBanDays] = useState("7");
   const [banTarget, setBanTarget] = useState<string | null>(null);
+  const [editTarget, setEditTarget] = useState<ProfileRow | null>(null);
+  const [editForm, setEditForm] = useState({ full_name: "", city: "", congregation: "" });
 
   useEffect(() => { load(); }, []);
 
@@ -102,6 +116,39 @@ export default function AdminUsers() {
     } else {
       await logAudit("make_admin", id);
       toast({ title: "Usuário promovido a admin" });
+    }
+  }
+
+  function openEdit(p: ProfileRow) {
+    setEditForm({ full_name: p.full_name, city: p.city || "", congregation: p.congregation || "" });
+    setEditTarget(p);
+  }
+
+  async function saveEdit() {
+    if (!editTarget) return;
+    const { error } = await supabase.from("profiles").update({
+      full_name: editForm.full_name,
+      city: editForm.city,
+      congregation: editForm.congregation,
+    }).eq("id", editTarget.id);
+    if (error) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Perfil atualizado" });
+      await logAudit("edit_user", editTarget.id, editForm);
+      setProfiles(ps => ps.map(p => p.id === editTarget.id ? { ...p, ...editForm } : p));
+    }
+    setEditTarget(null);
+  }
+
+  async function deleteUser(id: string) {
+    const { error } = await supabase.functions.invoke("delete-user", { body: { userId: id } });
+    if (error) {
+      toast({ title: "Erro ao excluir", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Usuário excluído" });
+      await logAudit("delete_user", id);
+      setProfiles(ps => ps.filter(p => p.id !== id));
     }
   }
 
@@ -192,12 +239,62 @@ export default function AdminUsers() {
                   <Button size="sm" variant="ghost" onClick={() => makeAdmin(p.id)} title="Tornar admin">
                     <ShieldCheck className="h-4 w-4 text-accent" />
                   </Button>
+
+                  <Button size="sm" variant="ghost" onClick={() => openEdit(p)} title="Editar">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button size="sm" variant="ghost" title="Excluir">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Excluir usuário</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Tem certeza que deseja excluir {p.full_name || "este usuário"}? Esta ação é irreversível.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => deleteUser(p.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                          Excluir
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      {/* Edit Dialog */}
+      <Dialog open={!!editTarget} onOpenChange={o => !o && setEditTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="font-serif">Editar Perfil</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label className="text-sm">Nome</Label>
+              <Input value={editForm.full_name} onChange={e => setEditForm(f => ({ ...f, full_name: e.target.value }))} />
+            </div>
+            <div>
+              <Label className="text-sm">Cidade</Label>
+              <Input value={editForm.city} onChange={e => setEditForm(f => ({ ...f, city: e.target.value }))} />
+            </div>
+            <div>
+              <Label className="text-sm">Congregação</Label>
+              <Input value={editForm.congregation} onChange={e => setEditForm(f => ({ ...f, congregation: e.target.value }))} />
+            </div>
+            <Button className="w-full" onClick={saveEdit}>Salvar alterações</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
