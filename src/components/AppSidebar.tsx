@@ -1,4 +1,4 @@
-import { Users, Heart, BookOpen, User, Shield, LogOut, Ticket } from "lucide-react";
+import { Users, Heart, BookOpen, User, Shield, LogOut, Ticket, LayoutDashboard, Bell, ScrollText } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 const menuItems = [
   { title: "Compatíveis", url: "/app", icon: Users },
   { title: "Matches", url: "/app/matches", icon: Heart },
+  { title: "Notificações", url: "/app/notifications", icon: Bell },
   { title: "Preparação", url: "/app/preparacao", icon: BookOpen },
   { title: "Perfil", url: "/app/profile", icon: User },
 ];
@@ -67,6 +68,14 @@ export function AppSidebar() {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
+                    <NavLink to="/app/admin/dashboard" className="hover:bg-muted/50" activeClassName="bg-muted text-accent font-medium">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
                     <NavLink to="/app/admin/users" className="hover:bg-muted/50" activeClassName="bg-muted text-accent font-medium">
                       <Users className="mr-2 h-4 w-4" />
                       <span>Usuários</span>
@@ -86,6 +95,14 @@ export function AppSidebar() {
                     <NavLink to="/app/admin/invites" className="hover:bg-muted/50" activeClassName="bg-muted text-accent font-medium">
                       <Ticket className="mr-2 h-4 w-4" />
                       <span>Convites</span>
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <NavLink to="/app/admin/audit" className="hover:bg-muted/50" activeClassName="bg-muted text-accent font-medium">
+                      <ScrollText className="mr-2 h-4 w-4" />
+                      <span>Auditoria</span>
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

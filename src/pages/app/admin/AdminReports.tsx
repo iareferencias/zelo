@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +18,7 @@ interface Report {
 }
 
 export default function AdminReports() {
+  const { user } = useAuth();
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -31,13 +33,35 @@ export default function AdminReports() {
     setLoading(false);
   }
 
-  async function updateStatus(id: string, status: string) {
+  async function updateStatus(id: string, status: string, reportedId: string) {
     const { error } = await supabase.from("reports").update({ status }).eq("id", id);
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
       toast({ title: `Status atualizado para ${status}` });
       setReports(rs => rs.map(r => r.id === id ? { ...r, status } : r));
+
+      // Log audit
+      if (user) {
+        await supabase.from("audit_logs").insert({
+          actor_id: user.id,
+          action: `report_${status}`,
+          target_id: id,
+          metadata: { reported_id: reportedId },
+        } as any);
+      }
+
+      // Notify reporter when resolved
+      if (status === "resolved") {
+        const report = reports.find(r => r.id === id);
+        if (report) {
+          await supabase.from("notifications").insert({
+            user_id: report.reporter_id,
+            type: "report_resolved",
+            reference_id: id,
+          } as any);
+        }
+      }
     }
   }
 
@@ -67,7 +91,7 @@ export default function AdminReports() {
                     <Badge variant={r.status === "open" ? "destructive" : r.status === "resolved" ? "default" : "secondary"}>
                       {r.status}
                     </Badge>
-                    <Select value={r.status} onValueChange={v => updateStatus(r.id, v)}>
+                    <Select value={r.status} onValueChange={v => updateStatus(r.id, v, r.reported_id)}>
                       <SelectTrigger className="w-[130px]">
                         <SelectValue />
                       </SelectTrigger>

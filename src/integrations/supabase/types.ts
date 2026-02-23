@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          actor_id: string
+          created_at: string
+          id: string
+          metadata: Json | null
+          target_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          target_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          target_id?: string | null
+        }
+        Relationships: []
+      }
       invites: {
         Row: {
           code: string
@@ -184,17 +211,48 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          read: boolean
+          reference_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          read?: boolean
+          reference_id?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          read?: boolean
+          reference_id?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null
           approved: boolean | null
           avatar_url: string | null
+          banned_until: string | null
           city: string | null
           congregation: string | null
           created_at: string | null
+          daily_likes_count: number
+          daily_message_count: number
           full_name: string
           gender: string | null
           id: string
+          last_like_reset: string
           marriage_intent: boolean | null
           onboarding_completed: boolean
           participation_tags: string[] | null
@@ -203,17 +261,22 @@ export type Database = {
           testimony: string | null
           updated_at: string | null
           wants_children: boolean | null
+          warning_level: number
         }
         Insert: {
           age?: number | null
           approved?: boolean | null
           avatar_url?: string | null
+          banned_until?: string | null
           city?: string | null
           congregation?: string | null
           created_at?: string | null
+          daily_likes_count?: number
+          daily_message_count?: number
           full_name?: string
           gender?: string | null
           id: string
+          last_like_reset?: string
           marriage_intent?: boolean | null
           onboarding_completed?: boolean
           participation_tags?: string[] | null
@@ -222,17 +285,22 @@ export type Database = {
           testimony?: string | null
           updated_at?: string | null
           wants_children?: boolean | null
+          warning_level?: number
         }
         Update: {
           age?: number | null
           approved?: boolean | null
           avatar_url?: string | null
+          banned_until?: string | null
           city?: string | null
           congregation?: string | null
           created_at?: string | null
+          daily_likes_count?: number
+          daily_message_count?: number
           full_name?: string
           gender?: string | null
           id?: string
+          last_like_reset?: string
           marriage_intent?: boolean | null
           onboarding_completed?: boolean
           participation_tags?: string[] | null
@@ -241,6 +309,7 @@ export type Database = {
           testimony?: string | null
           updated_at?: string | null
           wants_children?: boolean | null
+          warning_level?: number
         }
         Relationships: []
       }

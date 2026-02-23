@@ -34,7 +34,6 @@ export default function Compatibles() {
     if (!user) return;
     setLoading(true);
 
-    // Get profiles (excluding self)
     const { data: profs } = await supabase
       .from("profiles")
       .select("id, full_name, age, city, congregation, testimony, gender")
@@ -42,7 +41,6 @@ export default function Compatibles() {
       .eq("approved", true)
       .eq("marriage_intent", true);
 
-    // Get today's likes count
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const { data: likes } = await supabase
@@ -55,7 +53,6 @@ export default function Compatibles() {
     setLikedIds(likedSet);
     setTodayLikes(likes?.length || 0);
 
-    // Compute scores for each profile
     const scored: ProfileWithScore[] = [];
     for (const p of profs || []) {
       const { data: scoreData } = await supabase.rpc("compute_match_score", {
@@ -66,7 +63,6 @@ export default function Compatibles() {
       scored.push({ ...p, score: result.score, reasons: result.reasons || [] });
     }
 
-    // Sort by score descending
     scored.sort((a, b) => b.score - a.score);
     setProfiles(scored);
     setLoading(false);
@@ -89,6 +85,13 @@ export default function Compatibles() {
       return;
     }
 
+    // Send notification to liked user
+    await supabase.from("notifications").insert({
+      user_id: toUser,
+      type: "like_received",
+      reference_id: user.id,
+    } as any);
+
     // Check for mutual like → create match
     const { data: mutual } = await supabase
       .from("likes")
@@ -99,7 +102,14 @@ export default function Compatibles() {
 
     if (mutual) {
       const [a, b] = [user.id, toUser].sort();
-      await supabase.from("matches").insert({ user_a: a, user_b: b });
+      const { data: match } = await supabase.from("matches").insert({ user_a: a, user_b: b }).select("id").single();
+      
+      // Notify both users about match
+      await supabase.from("notifications").insert([
+        { user_id: user.id, type: "match_created", reference_id: match?.id },
+        { user_id: toUser, type: "match_created", reference_id: match?.id },
+      ] as any);
+      
       toast({ title: "🎉 Match criado!", description: "Vocês demonstraram interesse mútuo." });
     } else {
       toast({ title: "Interesse demonstrado" });
