@@ -43,13 +43,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function checkAdmin(userId: string) {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    setIsAdmin(!!data);
+    // user_roles table doesn't exist in this Supabase project
+    // Admin check disabled until proper roles table is created
+    setIsAdmin(false);
   }
 
   async function signUp(email: string, password: string) {
