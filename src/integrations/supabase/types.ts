@@ -14,414 +14,1067 @@ export type Database = {
   }
   public: {
     Tables: {
-      audit_logs: {
+      campanhas: {
         Row: {
-          action: string
-          actor_id: string
-          created_at: string
-          id: string
-          metadata: Json | null
-          target_id: string | null
+          ativa: boolean
+          atualizado_em: string
+          criado_em: string
+          descricao: string
+          dias_disponiveis: Json | null
+          duracao_atendimento: number | null
+          empresa_id: number
+          horarios_disponiveis: Json | null
+          id: number
+          link_form_unico: string
+          nome: string
+          percentual_comissao: number
+          permitir_anexo: boolean
+          preco: number
+          texto_agendamento: string | null
+          usar_agendamento: boolean
         }
         Insert: {
-          action: string
-          actor_id: string
-          created_at?: string
-          id?: string
-          metadata?: Json | null
-          target_id?: string | null
+          ativa?: boolean
+          atualizado_em: string
+          criado_em?: string
+          descricao: string
+          dias_disponiveis?: Json | null
+          duracao_atendimento?: number | null
+          empresa_id: number
+          horarios_disponiveis?: Json | null
+          id?: number
+          link_form_unico: string
+          nome: string
+          percentual_comissao: number
+          permitir_anexo?: boolean
+          preco: number
+          texto_agendamento?: string | null
+          usar_agendamento?: boolean
         }
         Update: {
-          action?: string
-          actor_id?: string
-          created_at?: string
-          id?: string
-          metadata?: Json | null
-          target_id?: string | null
-        }
-        Relationships: []
-      }
-      invites: {
-        Row: {
-          code: string
-          created_at: string
-          created_by: string | null
-          id: string
-          status: string
-          used_by: string | null
-        }
-        Insert: {
-          code: string
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          status?: string
-          used_by?: string | null
-        }
-        Update: {
-          code?: string
-          created_at?: string
-          created_by?: string | null
-          id?: string
-          status?: string
-          used_by?: string | null
-        }
-        Relationships: []
-      }
-      likes: {
-        Row: {
-          created_at: string | null
-          from_user: string
-          id: string
-          to_user: string
-        }
-        Insert: {
-          created_at?: string | null
-          from_user: string
-          id?: string
-          to_user: string
-        }
-        Update: {
-          created_at?: string | null
-          from_user?: string
-          id?: string
-          to_user?: string
+          ativa?: boolean
+          atualizado_em?: string
+          criado_em?: string
+          descricao?: string
+          dias_disponiveis?: Json | null
+          duracao_atendimento?: number | null
+          empresa_id?: number
+          horarios_disponiveis?: Json | null
+          id?: number
+          link_form_unico?: string
+          nome?: string
+          percentual_comissao?: number
+          permitir_anexo?: boolean
+          preco?: number
+          texto_agendamento?: string | null
+          usar_agendamento?: boolean
         }
         Relationships: [
           {
-            foreignKeyName: "likes_from_user_fkey"
-            columns: ["from_user"]
+            foreignKeyName: "campanhas_empresa_id_fkey"
+            columns: ["empresa_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "likes_to_user_fkey"
-            columns: ["to_user"]
-            isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "empresas"
             referencedColumns: ["id"]
           },
         ]
       }
-      match_gate: {
+      click_tracking: {
         Row: {
-          created_at: string
-          id: string
-          match_id: string
-          prayed: boolean
-          user_id: string
+          campanha_id: number
+          criado_em: string
+          id: number
+          ip_address: string
+          referenciador_id: number | null
+          user_agent: string | null
         }
         Insert: {
-          created_at?: string
-          id?: string
-          match_id: string
-          prayed?: boolean
-          user_id: string
+          campanha_id: number
+          criado_em?: string
+          id?: number
+          ip_address: string
+          referenciador_id?: number | null
+          user_agent?: string | null
         }
         Update: {
-          created_at?: string
-          id?: string
-          match_id?: string
-          prayed?: boolean
-          user_id?: string
+          campanha_id?: number
+          criado_em?: string
+          id?: number
+          ip_address?: string
+          referenciador_id?: number | null
+          user_agent?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "match_gate_match_id_fkey"
-            columns: ["match_id"]
+            foreignKeyName: "click_tracking_campanha_id_fkey"
+            columns: ["campanha_id"]
             isOneToOne: false
-            referencedRelation: "matches"
+            referencedRelation: "campanhas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "click_tracking_referenciador_id_fkey"
+            columns: ["referenciador_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
             referencedColumns: ["id"]
           },
         ]
       }
-      matches: {
+      cupons: {
         Row: {
-          created_at: string | null
-          id: string
-          user_a: string
-          user_b: string
+          atualizado_em: string
+          categoria: Database["public"]["Enums"]["CategoriaCupom"]
+          codigo: string
+          criado_em: string
+          duracao_desconto: Database["public"]["Enums"]["DuracaoDesconto"]
+          duracao_meses: number | null
+          id: number
+          limite_usos: number | null
+          mensagem_personalizada: string | null
+          nome_interno: string
+          status: Database["public"]["Enums"]["StatusCupom"]
+          tipo: Database["public"]["Enums"]["TipoCupom"]
+          usos_atuais: number
+          validade: string | null
+          valor: number
         }
         Insert: {
-          created_at?: string | null
-          id?: string
-          user_a: string
-          user_b: string
+          atualizado_em: string
+          categoria: Database["public"]["Enums"]["CategoriaCupom"]
+          codigo: string
+          criado_em?: string
+          duracao_desconto?: Database["public"]["Enums"]["DuracaoDesconto"]
+          duracao_meses?: number | null
+          id?: number
+          limite_usos?: number | null
+          mensagem_personalizada?: string | null
+          nome_interno: string
+          status?: Database["public"]["Enums"]["StatusCupom"]
+          tipo: Database["public"]["Enums"]["TipoCupom"]
+          usos_atuais?: number
+          validade?: string | null
+          valor: number
         }
         Update: {
-          created_at?: string | null
-          id?: string
-          user_a?: string
-          user_b?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "matches_user_a_fkey"
-            columns: ["user_a"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "matches_user_b_fkey"
-            columns: ["user_b"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      messages: {
-        Row: {
-          body: string
-          created_at: string | null
-          id: string
-          match_id: string
-          sender_id: string
-        }
-        Insert: {
-          body: string
-          created_at?: string | null
-          id?: string
-          match_id: string
-          sender_id: string
-        }
-        Update: {
-          body?: string
-          created_at?: string | null
-          id?: string
-          match_id?: string
-          sender_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "messages_match_id_fkey"
-            columns: ["match_id"]
-            isOneToOne: false
-            referencedRelation: "matches"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "messages_sender_id_fkey"
-            columns: ["sender_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      notifications: {
-        Row: {
-          created_at: string
-          id: string
-          read: boolean
-          reference_id: string | null
-          type: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          read?: boolean
-          reference_id?: string | null
-          type: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          read?: boolean
-          reference_id?: string | null
-          type?: string
-          user_id?: string
+          atualizado_em?: string
+          categoria?: Database["public"]["Enums"]["CategoriaCupom"]
+          codigo?: string
+          criado_em?: string
+          duracao_desconto?: Database["public"]["Enums"]["DuracaoDesconto"]
+          duracao_meses?: number | null
+          id?: number
+          limite_usos?: number | null
+          mensagem_personalizada?: string | null
+          nome_interno?: string
+          status?: Database["public"]["Enums"]["StatusCupom"]
+          tipo?: Database["public"]["Enums"]["TipoCupom"]
+          usos_atuais?: number
+          validade?: string | null
+          valor?: number
         }
         Relationships: []
       }
-      profiles: {
+      empresas: {
         Row: {
-          age: number | null
-          approved: boolean | null
-          avatar_url: string | null
-          banned_until: string | null
-          city: string | null
-          congregation: string | null
-          created_at: string | null
-          daily_likes_count: number
-          daily_message_count: number
-          full_name: string
-          gender: string | null
-          id: string
-          last_like_reset: string
-          marriage_intent: boolean | null
-          onboarding_completed: boolean
-          participation_tags: string[] | null
-          show_congregation: boolean
-          show_photo: boolean
-          testimony: string | null
-          updated_at: string | null
-          wants_children: boolean | null
-          warning_level: number
+          administrador_id: number
+          atualizado_em: string
+          cnpj: string
+          criado_em: string
+          email_contato: string | null
+          endereco: string | null
+          id: number
+          logo_url: string | null
+          nome: string
+          telefone: string | null
         }
         Insert: {
-          age?: number | null
-          approved?: boolean | null
-          avatar_url?: string | null
-          banned_until?: string | null
-          city?: string | null
-          congregation?: string | null
-          created_at?: string | null
-          daily_likes_count?: number
-          daily_message_count?: number
-          full_name?: string
-          gender?: string | null
-          id: string
-          last_like_reset?: string
-          marriage_intent?: boolean | null
-          onboarding_completed?: boolean
-          participation_tags?: string[] | null
-          show_congregation?: boolean
-          show_photo?: boolean
-          testimony?: string | null
-          updated_at?: string | null
-          wants_children?: boolean | null
-          warning_level?: number
+          administrador_id: number
+          atualizado_em: string
+          cnpj: string
+          criado_em?: string
+          email_contato?: string | null
+          endereco?: string | null
+          id?: number
+          logo_url?: string | null
+          nome: string
+          telefone?: string | null
         }
         Update: {
-          age?: number | null
-          approved?: boolean | null
-          avatar_url?: string | null
-          banned_until?: string | null
-          city?: string | null
-          congregation?: string | null
-          created_at?: string | null
-          daily_likes_count?: number
-          daily_message_count?: number
-          full_name?: string
-          gender?: string | null
-          id?: string
-          last_like_reset?: string
-          marriage_intent?: boolean | null
-          onboarding_completed?: boolean
-          participation_tags?: string[] | null
-          show_congregation?: boolean
-          show_photo?: boolean
-          testimony?: string | null
-          updated_at?: string | null
-          wants_children?: boolean | null
-          warning_level?: number
-        }
-        Relationships: []
-      }
-      reports: {
-        Row: {
-          created_at: string | null
-          details: string | null
-          id: string
-          reason: string
-          reported_id: string
-          reporter_id: string
-          status: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          details?: string | null
-          id?: string
-          reason: string
-          reported_id: string
-          reporter_id: string
-          status?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          details?: string | null
-          id?: string
-          reason?: string
-          reported_id?: string
-          reporter_id?: string
-          status?: string | null
+          administrador_id?: number
+          atualizado_em?: string
+          cnpj?: string
+          criado_em?: string
+          email_contato?: string | null
+          endereco?: string | null
+          id?: number
+          logo_url?: string | null
+          nome?: string
+          telefone?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "reports_reported_id_fkey"
-            columns: ["reported_id"]
+            foreignKeyName: "empresas_administrador_id_fkey"
+            columns: ["administrador_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reports_reporter_id_fkey"
-            columns: ["reporter_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
+            referencedRelation: "usuarios"
             referencedColumns: ["id"]
           },
         ]
       }
-      user_roles: {
+      experimental_time_slots: {
         Row: {
-          id: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
+          active: boolean
+          criado_em: string
+          day_of_week: number
+          id: number
+          time: string
         }
         Insert: {
-          id?: string
-          role: Database["public"]["Enums"]["app_role"]
-          user_id: string
+          active?: boolean
+          criado_em?: string
+          day_of_week: number
+          id?: number
+          time: string
         }
         Update: {
-          id?: string
-          role?: Database["public"]["Enums"]["app_role"]
-          user_id?: string
+          active?: boolean
+          criado_em?: string
+          day_of_week?: number
+          id?: number
+          time?: string
         }
         Relationships: []
       }
-      waitlist: {
+      influencer_post_validations: {
         Row: {
-          city: string | null
-          created_at: string
+          criado_em: string
+          descricao_prova: string | null
+          id: number
+          ip_primeiro_clique: string | null
+          motivo_rejeicao: string | null
+          primeiro_clique: string | null
+          rejeitado: boolean
+          rejeitado_em: string | null
+          tipo_validacao: Database["public"]["Enums"]["TipoValidacaoInfluencer"]
+          upload_em: string | null
+          url_prova: string | null
+          validado: boolean
+          validado_em: string | null
+          validado_por_id: number | null
+          weekly_link_id: number
+        }
+        Insert: {
+          criado_em?: string
+          descricao_prova?: string | null
+          id?: number
+          ip_primeiro_clique?: string | null
+          motivo_rejeicao?: string | null
+          primeiro_clique?: string | null
+          rejeitado?: boolean
+          rejeitado_em?: string | null
+          tipo_validacao: Database["public"]["Enums"]["TipoValidacaoInfluencer"]
+          upload_em?: string | null
+          url_prova?: string | null
+          validado?: boolean
+          validado_em?: string | null
+          validado_por_id?: number | null
+          weekly_link_id: number
+        }
+        Update: {
+          criado_em?: string
+          descricao_prova?: string | null
+          id?: number
+          ip_primeiro_clique?: string | null
+          motivo_rejeicao?: string | null
+          primeiro_clique?: string | null
+          rejeitado?: boolean
+          rejeitado_em?: string | null
+          tipo_validacao?: Database["public"]["Enums"]["TipoValidacaoInfluencer"]
+          upload_em?: string | null
+          url_prova?: string | null
+          validado?: boolean
+          validado_em?: string | null
+          validado_por_id?: number | null
+          weekly_link_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_post_validations_weekly_link_id_fkey"
+            columns: ["weekly_link_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_weekly_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_weekly_compliance: {
+        Row: {
+          atualizado_em: string
+          campanha_id: number
+          clicks_recebidos: number
+          criado_em: string
+          id: number
+          leads_gerados: number
+          link_gerado: boolean
+          link_gerado_em: string | null
+          postagem_validada: boolean
+          postagem_validada_em: string | null
+          representacao_id: number
+          semana_fechada: boolean
+          semana_fechada_em: string | null
+          semana_fim: string
+          semana_inicio: string
+          status: Database["public"]["Enums"]["StatusComplianceInfluencer"]
+        }
+        Insert: {
+          atualizado_em: string
+          campanha_id: number
+          clicks_recebidos?: number
+          criado_em?: string
+          id?: number
+          leads_gerados?: number
+          link_gerado?: boolean
+          link_gerado_em?: string | null
+          postagem_validada?: boolean
+          postagem_validada_em?: string | null
+          representacao_id: number
+          semana_fechada?: boolean
+          semana_fechada_em?: string | null
+          semana_fim: string
+          semana_inicio: string
+          status?: Database["public"]["Enums"]["StatusComplianceInfluencer"]
+        }
+        Update: {
+          atualizado_em?: string
+          campanha_id?: number
+          clicks_recebidos?: number
+          criado_em?: string
+          id?: number
+          leads_gerados?: number
+          link_gerado?: boolean
+          link_gerado_em?: string | null
+          postagem_validada?: boolean
+          postagem_validada_em?: string | null
+          representacao_id?: number
+          semana_fechada?: boolean
+          semana_fechada_em?: string | null
+          semana_fim?: string
+          semana_inicio?: string
+          status?: Database["public"]["Enums"]["StatusComplianceInfluencer"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_weekly_compliance_representacao_id_fkey"
+            columns: ["representacao_id"]
+            isOneToOne: false
+            referencedRelation: "representacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      influencer_weekly_links: {
+        Row: {
+          campanha_id: number
+          clicks_recebidos: number
+          gerado_em: string
+          id: number
+          link_gerado: string
+          representacao_id: number
+          semana_fim: string
+          semana_inicio: string
+          tipo_validacao:
+            | Database["public"]["Enums"]["TipoValidacaoInfluencer"]
+            | null
+          validado: boolean
+          validado_em: string | null
+        }
+        Insert: {
+          campanha_id: number
+          clicks_recebidos?: number
+          gerado_em?: string
+          id?: number
+          link_gerado: string
+          representacao_id: number
+          semana_fim: string
+          semana_inicio: string
+          tipo_validacao?:
+            | Database["public"]["Enums"]["TipoValidacaoInfluencer"]
+            | null
+          validado?: boolean
+          validado_em?: string | null
+        }
+        Update: {
+          campanha_id?: number
+          clicks_recebidos?: number
+          gerado_em?: string
+          id?: number
+          link_gerado?: string
+          representacao_id?: number
+          semana_fim?: string
+          semana_inicio?: string
+          tipo_validacao?:
+            | Database["public"]["Enums"]["TipoValidacaoInfluencer"]
+            | null
+          validado?: boolean
+          validado_em?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_weekly_links_representacao_id_fkey"
+            columns: ["representacao_id"]
+            isOneToOne: false
+            referencedRelation: "representacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_historico: {
+        Row: {
+          acao: string
+          criado_em: string
+          id: number
+          lead_id: number
+          observacao: string | null
+          status_anterior: string | null
+          status_novo: string | null
+          usuario_id: number
+          usuario_nome: string
+        }
+        Insert: {
+          acao: string
+          criado_em?: string
+          id?: number
+          lead_id: number
+          observacao?: string | null
+          status_anterior?: string | null
+          status_novo?: string | null
+          usuario_id: number
+          usuario_nome: string
+        }
+        Update: {
+          acao?: string
+          criado_em?: string
+          id?: number
+          lead_id?: number
+          observacao?: string | null
+          status_anterior?: string | null
+          status_novo?: string | null
+          usuario_id?: number
+          usuario_nome?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_historico_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          approved_at: string | null
+          arquivo_anexo: string | null
+          atualizado_em: string
+          campanha_id: number
+          closed_value: number | null
+          commission_paid_at: string | null
+          commission_released_at: string | null
+          commission_status: Database["public"]["Enums"]["CommissionStatus"]
+          commission_value: number
+          criado_em: string
           email: string
-          id: string
-          name: string
+          horario_agendado: string | null
+          id: number
+          is_interno: boolean
+          is_perdido: boolean
+          motivo_perdido: string | null
+          nome: string
+          obs_interna: string | null
+          observacao: string | null
+          payment_received_at: string | null
+          payment_status: Database["public"]["Enums"]["PaymentStatus"]
+          perdido_em: string | null
+          preferencia_horario: string | null
+          referenciador_id: number | null
+          status: Database["public"]["Enums"]["StatusLead"]
+          status_comercial: Database["public"]["Enums"]["StatusComercial"]
+          status_financeiro: Database["public"]["Enums"]["StatusFinanceiro"]
+          telefone: string
         }
         Insert: {
-          city?: string | null
-          created_at?: string
+          approved_at?: string | null
+          arquivo_anexo?: string | null
+          atualizado_em: string
+          campanha_id: number
+          closed_value?: number | null
+          commission_paid_at?: string | null
+          commission_released_at?: string | null
+          commission_status?: Database["public"]["Enums"]["CommissionStatus"]
+          commission_value?: number
+          criado_em?: string
           email: string
-          id?: string
-          name: string
+          horario_agendado?: string | null
+          id?: number
+          is_interno?: boolean
+          is_perdido?: boolean
+          motivo_perdido?: string | null
+          nome: string
+          obs_interna?: string | null
+          observacao?: string | null
+          payment_received_at?: string | null
+          payment_status?: Database["public"]["Enums"]["PaymentStatus"]
+          perdido_em?: string | null
+          preferencia_horario?: string | null
+          referenciador_id?: number | null
+          status?: Database["public"]["Enums"]["StatusLead"]
+          status_comercial?: Database["public"]["Enums"]["StatusComercial"]
+          status_financeiro?: Database["public"]["Enums"]["StatusFinanceiro"]
+          telefone: string
         }
         Update: {
-          city?: string | null
-          created_at?: string
+          approved_at?: string | null
+          arquivo_anexo?: string | null
+          atualizado_em?: string
+          campanha_id?: number
+          closed_value?: number | null
+          commission_paid_at?: string | null
+          commission_released_at?: string | null
+          commission_status?: Database["public"]["Enums"]["CommissionStatus"]
+          commission_value?: number
+          criado_em?: string
           email?: string
+          horario_agendado?: string | null
+          id?: number
+          is_interno?: boolean
+          is_perdido?: boolean
+          motivo_perdido?: string | null
+          nome?: string
+          obs_interna?: string | null
+          observacao?: string | null
+          payment_received_at?: string | null
+          payment_status?: Database["public"]["Enums"]["PaymentStatus"]
+          perdido_em?: string | null
+          preferencia_horario?: string | null
+          referenciador_id?: number | null
+          status?: Database["public"]["Enums"]["StatusLead"]
+          status_comercial?: Database["public"]["Enums"]["StatusComercial"]
+          status_financeiro?: Database["public"]["Enums"]["StatusFinanceiro"]
+          telefone?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "campanhas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_referenciador_id_fkey"
+            columns: ["referenciador_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      logs_admin: {
+        Row: {
+          acao: string
+          admin_id: number
+          campanha_id: number | null
+          campanha_nome: string | null
+          criado_em: string
+          detalhes: string | null
+          id: number
+          lead_id: number | null
+          representacao_id: number | null
+          usuario_envolvido_id: number | null
+          usuario_envolvido_nome: string | null
+          valor_comissao: number | null
+        }
+        Insert: {
+          acao: string
+          admin_id: number
+          campanha_id?: number | null
+          campanha_nome?: string | null
+          criado_em?: string
+          detalhes?: string | null
+          id?: number
+          lead_id?: number | null
+          representacao_id?: number | null
+          usuario_envolvido_id?: number | null
+          usuario_envolvido_nome?: string | null
+          valor_comissao?: number | null
+        }
+        Update: {
+          acao?: string
+          admin_id?: number
+          campanha_id?: number | null
+          campanha_nome?: string | null
+          criado_em?: string
+          detalhes?: string | null
+          id?: number
+          lead_id?: number | null
+          representacao_id?: number | null
+          usuario_envolvido_id?: number | null
+          usuario_envolvido_nome?: string | null
+          valor_comissao?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "logs_admin_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      memberships: {
+        Row: {
+          created_at: string | null
+          role: string | null
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          role?: string | null
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          role?: string | null
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "memberships_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notificacoes: {
+        Row: {
+          criada_em: string
+          dados: Json | null
+          id: number
+          lida: boolean
+          lida_em: string | null
+          link_acao: string | null
+          mensagem: string
+          tipo: Database["public"]["Enums"]["TipoNotificacao"]
+          titulo: string
+          usuario_id: number
+        }
+        Insert: {
+          criada_em?: string
+          dados?: Json | null
+          id?: number
+          lida?: boolean
+          lida_em?: string | null
+          link_acao?: string | null
+          mensagem: string
+          tipo?: Database["public"]["Enums"]["TipoNotificacao"]
+          titulo: string
+          usuario_id: number
+        }
+        Update: {
+          criada_em?: string
+          dados?: Json | null
+          id?: number
+          lida?: boolean
+          lida_em?: string | null
+          link_acao?: string | null
+          mensagem?: string
+          tipo?: Database["public"]["Enums"]["TipoNotificacao"]
+          titulo?: string
+          usuario_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notificacoes_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          api_key: string | null
+          created_at: string | null
+          id: string
+          name: string | null
+          repository_url: string | null
+          status: string | null
+          supabase_project_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          api_key?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string | null
+          repository_url?: string | null
+          status?: string | null
+          supabase_project_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          api_key?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string | null
+          repository_url?: string | null
+          status?: string | null
+          supabase_project_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      representacoes: {
+        Row: {
+          aprovado_em: string | null
+          desativado_em: string | null
+          desativado_por_id: number | null
+          empresa_id: number
+          excluido: boolean
+          excluido_em: string | null
+          excluido_por_id: number | null
+          id: number
+          influencer_ativado_em: string | null
+          influencer_ativado_por_id: number | null
+          modo_influencer: boolean
+          motivo_desativacao: string | null
+          motivo_exclusao: string | null
+          motivo_rejeicao: string | null
+          reativado_em: string | null
+          reativado_por_id: number | null
+          rejeitado_em: string | null
+          solicitado_em: string
+          status: Database["public"]["Enums"]["StatusRepresentacao"]
+          status_ativo: boolean
+          usuario_id: number
+        }
+        Insert: {
+          aprovado_em?: string | null
+          desativado_em?: string | null
+          desativado_por_id?: number | null
+          empresa_id: number
+          excluido?: boolean
+          excluido_em?: string | null
+          excluido_por_id?: number | null
+          id?: number
+          influencer_ativado_em?: string | null
+          influencer_ativado_por_id?: number | null
+          modo_influencer?: boolean
+          motivo_desativacao?: string | null
+          motivo_exclusao?: string | null
+          motivo_rejeicao?: string | null
+          reativado_em?: string | null
+          reativado_por_id?: number | null
+          rejeitado_em?: string | null
+          solicitado_em?: string
+          status?: Database["public"]["Enums"]["StatusRepresentacao"]
+          status_ativo?: boolean
+          usuario_id: number
+        }
+        Update: {
+          aprovado_em?: string | null
+          desativado_em?: string | null
+          desativado_por_id?: number | null
+          empresa_id?: number
+          excluido?: boolean
+          excluido_em?: string | null
+          excluido_por_id?: number | null
+          id?: number
+          influencer_ativado_em?: string | null
+          influencer_ativado_por_id?: number | null
+          modo_influencer?: boolean
+          motivo_desativacao?: string | null
+          motivo_exclusao?: string | null
+          motivo_rejeicao?: string | null
+          reativado_em?: string | null
+          reativado_por_id?: number | null
+          rejeitado_em?: string | null
+          solicitado_em?: string
+          status?: Database["public"]["Enums"]["StatusRepresentacao"]
+          status_ativo?: boolean
+          usuario_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "representacoes_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: false
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "representacoes_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenants: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
           id?: string
           name?: string
         }
         Relationships: []
       }
+      uso_cupom: {
+        Row: {
+          criado_em: string
+          cupom_id: number
+          email: string | null
+          id: number
+          usuario_id: number | null
+          valor_desconto: number
+        }
+        Insert: {
+          criado_em?: string
+          cupom_id: number
+          email?: string | null
+          id?: number
+          usuario_id?: number | null
+          valor_desconto: number
+        }
+        Update: {
+          criado_em?: string
+          cupom_id?: number
+          email?: string | null
+          id?: number
+          usuario_id?: number | null
+          valor_desconto?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "uso_cupom_cupom_id_fkey"
+            columns: ["cupom_id"]
+            isOneToOne: false
+            referencedRelation: "cupons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      usuarios: {
+        Row: {
+          account_holder_name: string | null
+          assinatura_ativa: boolean
+          assinatura_cancelada: boolean | null
+          assinatura_id: string | null
+          atualizado_em: string
+          bank_account_number: string | null
+          bank_account_type: string | null
+          bank_agency: string | null
+          bank_data_completed: boolean | null
+          bank_name: string | null
+          cancelamento_data: string | null
+          cancelamento_tipo: string | null
+          cancelamento_valido_ate: string | null
+          conta_excluida: boolean
+          conta_excluida_em: string | null
+          criado_em: string
+          email: string
+          email_confirmado: boolean
+          id: number
+          media_kit_url: string | null
+          nome: string
+          pausada_ate: string | null
+          perfil: string | null
+          pix_key: string | null
+          plano: Database["public"]["Enums"]["TipoPlano"]
+          proximo_pagamento: string | null
+          role: Database["public"]["Enums"]["Role"]
+          senha_hash: string
+          telefone: string | null
+          tipo_referenciador:
+            | Database["public"]["Enums"]["TipoReferenciador"]
+            | null
+          token_confirmacao: string | null
+          token_expira_em: string | null
+          token_reset_expira_em: string | null
+          token_reset_senha: string | null
+          trial_fim: string | null
+          trial_inicio: string | null
+          ultimo_acesso: string | null
+        }
+        Insert: {
+          account_holder_name?: string | null
+          assinatura_ativa?: boolean
+          assinatura_cancelada?: boolean | null
+          assinatura_id?: string | null
+          atualizado_em: string
+          bank_account_number?: string | null
+          bank_account_type?: string | null
+          bank_agency?: string | null
+          bank_data_completed?: boolean | null
+          bank_name?: string | null
+          cancelamento_data?: string | null
+          cancelamento_tipo?: string | null
+          cancelamento_valido_ate?: string | null
+          conta_excluida?: boolean
+          conta_excluida_em?: string | null
+          criado_em?: string
+          email: string
+          email_confirmado?: boolean
+          id?: number
+          media_kit_url?: string | null
+          nome: string
+          pausada_ate?: string | null
+          perfil?: string | null
+          pix_key?: string | null
+          plano?: Database["public"]["Enums"]["TipoPlano"]
+          proximo_pagamento?: string | null
+          role?: Database["public"]["Enums"]["Role"]
+          senha_hash: string
+          telefone?: string | null
+          tipo_referenciador?:
+            | Database["public"]["Enums"]["TipoReferenciador"]
+            | null
+          token_confirmacao?: string | null
+          token_expira_em?: string | null
+          token_reset_expira_em?: string | null
+          token_reset_senha?: string | null
+          trial_fim?: string | null
+          trial_inicio?: string | null
+          ultimo_acesso?: string | null
+        }
+        Update: {
+          account_holder_name?: string | null
+          assinatura_ativa?: boolean
+          assinatura_cancelada?: boolean | null
+          assinatura_id?: string | null
+          atualizado_em?: string
+          bank_account_number?: string | null
+          bank_account_type?: string | null
+          bank_agency?: string | null
+          bank_data_completed?: boolean | null
+          bank_name?: string | null
+          cancelamento_data?: string | null
+          cancelamento_tipo?: string | null
+          cancelamento_valido_ate?: string | null
+          conta_excluida?: boolean
+          conta_excluida_em?: string | null
+          criado_em?: string
+          email?: string
+          email_confirmado?: boolean
+          id?: number
+          media_kit_url?: string | null
+          nome?: string
+          pausada_ate?: string | null
+          perfil?: string | null
+          pix_key?: string | null
+          plano?: Database["public"]["Enums"]["TipoPlano"]
+          proximo_pagamento?: string | null
+          role?: Database["public"]["Enums"]["Role"]
+          senha_hash?: string
+          telefone?: string | null
+          tipo_referenciador?:
+            | Database["public"]["Enums"]["TipoReferenciador"]
+            | null
+          token_confirmacao?: string | null
+          token_expira_em?: string | null
+          token_reset_expira_em?: string | null
+          token_reset_senha?: string | null
+          trial_fim?: string | null
+          trial_inicio?: string | null
+          ultimo_acesso?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      sms_templates: {
+        Row: {
+          conteudo: string | null
+          created_at: string | null
+          id: string | null
+          nome: string | null
+          owner_user_id: string | null
+        }
+        Insert: {
+          conteudo?: string | null
+          created_at?: string | null
+          id?: string | null
+          nome?: string | null
+          owner_user_id?: string | null
+        }
+        Update: {
+          conteudo?: string | null
+          created_at?: string | null
+          id?: string | null
+          nome?: string | null
+          owner_user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      compute_match_score: {
-        Args: { candidate_id: string; viewer_id: string }
-        Returns: {
-          reasons: string[]
-          score: number
-        }[]
-      }
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      exec_sql: { Args: { query: string }; Returns: undefined }
+      exec_sql_query: { Args: { query: string }; Returns: Json }
     }
     Enums: {
-      app_role: "admin" | "moderator" | "user"
+      app_role: "owner" | "admin" | "member" | "super_admin"
+      CategoriaCupom: "INTERNO" | "PUBLICO"
+      CommissionStatus: "BLOQUEADA" | "LIBERADA" | "PAGA"
+      DuracaoDesconto: "UMA_VEZ" | "REPETICAO" | "PARA_SEMPRE"
+      PaymentStatus: "NAO_PAGO" | "PAGO" | "PARCIAL"
+      Role: "ADMIN" | "REFERENCIADOR" | "SUPERMASTER"
+      StatusComercial:
+        | "NOVO"
+        | "EM_CONTATO"
+        | "NEGOCIACAO"
+        | "FECHADO"
+        | "COMERCIAL_FINALIZADO"
+      StatusComplianceInfluencer:
+        | "EM_ANDAMENTO"
+        | "OK"
+        | "FALHA"
+        | "PENDENTE_VALIDACAO"
+      StatusCupom: "ATIVO" | "PAUSADO" | "EXPIRADO"
+      StatusFinanceiro:
+        | "AGUARDANDO_PAGAMENTO"
+        | "PAGO"
+        | "COMISSAO_LIBERADA"
+        | "FINANCEIRO_FINALIZADO"
+      StatusLead: "PENDENTE" | "APROVADO" | "REJEITADO"
+      StatusRepresentacao: "PENDENTE" | "APROVADO" | "REJEITADO"
+      TipoCupom: "PERCENTUAL" | "VALOR_FIXO"
+      TipoNotificacao: "INFO" | "SUCCESS" | "WARNING" | "ERROR"
+      TipoPlano: "FREE" | "ESSENCIAL"
+      TipoReferenciador:
+        | "INFLUENCIADOR"
+        | "PARCEIRO_COMERCIAL"
+        | "AFILIADO"
+        | "OUTROS"
+      TipoValidacaoInfluencer: "CLIQUE" | "PROVA_UPLOAD"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -549,7 +1202,44 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "moderator", "user"],
+      app_role: ["owner", "admin", "member", "super_admin"],
+      CategoriaCupom: ["INTERNO", "PUBLICO"],
+      CommissionStatus: ["BLOQUEADA", "LIBERADA", "PAGA"],
+      DuracaoDesconto: ["UMA_VEZ", "REPETICAO", "PARA_SEMPRE"],
+      PaymentStatus: ["NAO_PAGO", "PAGO", "PARCIAL"],
+      Role: ["ADMIN", "REFERENCIADOR", "SUPERMASTER"],
+      StatusComercial: [
+        "NOVO",
+        "EM_CONTATO",
+        "NEGOCIACAO",
+        "FECHADO",
+        "COMERCIAL_FINALIZADO",
+      ],
+      StatusComplianceInfluencer: [
+        "EM_ANDAMENTO",
+        "OK",
+        "FALHA",
+        "PENDENTE_VALIDACAO",
+      ],
+      StatusCupom: ["ATIVO", "PAUSADO", "EXPIRADO"],
+      StatusFinanceiro: [
+        "AGUARDANDO_PAGAMENTO",
+        "PAGO",
+        "COMISSAO_LIBERADA",
+        "FINANCEIRO_FINALIZADO",
+      ],
+      StatusLead: ["PENDENTE", "APROVADO", "REJEITADO"],
+      StatusRepresentacao: ["PENDENTE", "APROVADO", "REJEITADO"],
+      TipoCupom: ["PERCENTUAL", "VALOR_FIXO"],
+      TipoNotificacao: ["INFO", "SUCCESS", "WARNING", "ERROR"],
+      TipoPlano: ["FREE", "ESSENCIAL"],
+      TipoReferenciador: [
+        "INFLUENCIADOR",
+        "PARCEIRO_COMERCIAL",
+        "AFILIADO",
+        "OUTROS",
+      ],
+      TipoValidacaoInfluencer: ["CLIQUE", "PROVA_UPLOAD"],
     },
   },
 } as const
