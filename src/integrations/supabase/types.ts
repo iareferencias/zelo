@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      campanha_disponibilidade: {
+        Row: {
+          active: boolean | null
+          campanha_id: number
+          criado_em: string | null
+          day_of_week: number
+          id: number
+          is_kids: boolean | null
+          time: string
+        }
+        Insert: {
+          active?: boolean | null
+          campanha_id: number
+          criado_em?: string | null
+          day_of_week: number
+          id?: number
+          is_kids?: boolean | null
+          time: string
+        }
+        Update: {
+          active?: boolean | null
+          campanha_id?: number
+          criado_em?: string | null
+          day_of_week?: number
+          id?: number
+          is_kids?: boolean | null
+          time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campanha_disponibilidade_campanha_id_fkey"
+            columns: ["campanha_id"]
+            isOneToOne: false
+            referencedRelation: "campanhas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campanhas: {
         Row: {
           ativa: boolean
@@ -22,6 +60,7 @@ export type Database = {
           descricao: string
           dias_disponiveis: Json | null
           duracao_atendimento: number | null
+          emails_notificacao: Json | null
           empresa_id: number
           horarios_disponiveis: Json | null
           id: number
@@ -40,6 +79,7 @@ export type Database = {
           descricao: string
           dias_disponiveis?: Json | null
           duracao_atendimento?: number | null
+          emails_notificacao?: Json | null
           empresa_id: number
           horarios_disponiveis?: Json | null
           id?: number
@@ -58,6 +98,7 @@ export type Database = {
           descricao?: string
           dias_disponiveis?: Json | null
           duracao_atendimento?: number | null
+          emails_notificacao?: Json | null
           empresa_id?: number
           horarios_disponiveis?: Json | null
           id?: number
@@ -488,6 +529,7 @@ export type Database = {
           email: string
           horario_agendado: string | null
           id: number
+          instagram_indicado: string | null
           is_interno: boolean
           is_perdido: boolean
           motivo_perdido: string | null
@@ -503,6 +545,8 @@ export type Database = {
           status_comercial: Database["public"]["Enums"]["StatusComercial"]
           status_financeiro: Database["public"]["Enums"]["StatusFinanceiro"]
           telefone: string
+          tipo_lead: Database["public"]["Enums"]["TipoLead"]
+          whatsapp_indicado: string | null
         }
         Insert: {
           approved_at?: string | null
@@ -518,6 +562,7 @@ export type Database = {
           email: string
           horario_agendado?: string | null
           id?: number
+          instagram_indicado?: string | null
           is_interno?: boolean
           is_perdido?: boolean
           motivo_perdido?: string | null
@@ -533,6 +578,8 @@ export type Database = {
           status_comercial?: Database["public"]["Enums"]["StatusComercial"]
           status_financeiro?: Database["public"]["Enums"]["StatusFinanceiro"]
           telefone: string
+          tipo_lead?: Database["public"]["Enums"]["TipoLead"]
+          whatsapp_indicado?: string | null
         }
         Update: {
           approved_at?: string | null
@@ -548,6 +595,7 @@ export type Database = {
           email?: string
           horario_agendado?: string | null
           id?: number
+          instagram_indicado?: string | null
           is_interno?: boolean
           is_perdido?: boolean
           motivo_perdido?: string | null
@@ -563,6 +611,8 @@ export type Database = {
           status_comercial?: Database["public"]["Enums"]["StatusComercial"]
           status_financeiro?: Database["public"]["Enums"]["StatusFinanceiro"]
           telefone?: string
+          tipo_lead?: Database["public"]["Enums"]["TipoLead"]
+          whatsapp_indicado?: string | null
         }
         Relationships: [
           {
@@ -1053,6 +1103,7 @@ export type Database = {
         | "NEGOCIACAO"
         | "FECHADO"
         | "COMERCIAL_FINALIZADO"
+        | "AGUARDANDO_CONVITE"
       StatusComplianceInfluencer:
         | "EM_ANDAMENTO"
         | "OK"
@@ -1067,6 +1118,7 @@ export type Database = {
       StatusLead: "PENDENTE" | "APROVADO" | "REJEITADO"
       StatusRepresentacao: "PENDENTE" | "APROVADO" | "REJEITADO"
       TipoCupom: "PERCENTUAL" | "VALOR_FIXO"
+      TipoLead: "NORMAL" | "INDICACAO_SUGERIDA"
       TipoNotificacao: "INFO" | "SUCCESS" | "WARNING" | "ERROR"
       TipoPlano: "FREE" | "ESSENCIAL"
       TipoReferenciador:
@@ -1214,6 +1266,7 @@ export const Constants = {
         "NEGOCIACAO",
         "FECHADO",
         "COMERCIAL_FINALIZADO",
+        "AGUARDANDO_CONVITE",
       ],
       StatusComplianceInfluencer: [
         "EM_ANDAMENTO",
@@ -1231,6 +1284,7 @@ export const Constants = {
       StatusLead: ["PENDENTE", "APROVADO", "REJEITADO"],
       StatusRepresentacao: ["PENDENTE", "APROVADO", "REJEITADO"],
       TipoCupom: ["PERCENTUAL", "VALOR_FIXO"],
+      TipoLead: ["NORMAL", "INDICACAO_SUGERIDA"],
       TipoNotificacao: ["INFO", "SUCCESS", "WARNING", "ERROR"],
       TipoPlano: ["FREE", "ESSENCIAL"],
       TipoReferenciador: [
