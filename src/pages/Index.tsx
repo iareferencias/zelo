@@ -45,15 +45,50 @@ const Index = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
         <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
           <span className="font-display text-xl font-semibold text-foreground">Zelo</span>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-xs font-medium text-muted-foreground hover:text-foreground"
-            asChild
-          >
-            <Link to="/login">Entrar</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs font-medium text-muted-foreground hover:text-foreground"
+              asChild
+            >
+              <Link to="/login">Entrar</Link>
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 text-muted-foreground hover:text-foreground"
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
         </div>
+
+        {/* Dropdown menu */}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="overflow-hidden border-t border-border/50 bg-background/95 backdrop-blur-md"
+            >
+              <div className="mx-auto max-w-4xl px-6 py-4 flex flex-col gap-1">
+                {menuSections.map((section) => (
+                  <button
+                    key={section.id}
+                    onClick={() => scrollTo(section.id)}
+                    className="text-left px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/5 rounded-lg transition-colors duration-150"
+                  >
+                    {section.label}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Hero */}
