@@ -653,6 +653,27 @@ export type Database = {
           },
         ]
       }
+      likes: {
+        Row: {
+          created_at: string
+          from_user: string
+          id: string
+          to_user: string
+        }
+        Insert: {
+          created_at?: string
+          from_user: string
+          id?: string
+          to_user: string
+        }
+        Update: {
+          created_at?: string
+          from_user?: string
+          id?: string
+          to_user?: string
+        }
+        Relationships: []
+      }
       logs_admin: {
         Row: {
           acao: string
@@ -705,6 +726,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      matches: {
+        Row: {
+          created_at: string
+          id: string
+          user_a: string
+          user_b: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_a: string
+          user_b: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_a?: string
+          user_b?: string
+        }
+        Relationships: []
       }
       memberships: {
         Row: {
@@ -782,9 +824,37 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          read: boolean
+          reference_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          read?: boolean
+          reference_id?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          read?: boolean
+          reference_id?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null
+          approved: boolean | null
           avatar_url: string | null
           city: string | null
           congregation: string | null
@@ -800,6 +870,7 @@ export type Database = {
         }
         Insert: {
           age?: number | null
+          approved?: boolean | null
           avatar_url?: string | null
           city?: string | null
           congregation?: string | null
@@ -815,6 +886,7 @@ export type Database = {
         }
         Update: {
           age?: number | null
+          approved?: boolean | null
           avatar_url?: string | null
           city?: string | null
           congregation?: string | null
@@ -1160,6 +1232,13 @@ export type Database = {
       }
     }
     Functions: {
+      compute_match_score: {
+        Args: { candidate_id: string; viewer_id: string }
+        Returns: {
+          reasons: string[]
+          score: number
+        }[]
+      }
       exec_sql: { Args: { query: string }; Returns: undefined }
       exec_sql_query: { Args: { query: string }; Returns: Json }
     }
