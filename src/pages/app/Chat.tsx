@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useDemoMode } from "@/hooks/useDemoMode";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send, Flag, Heart } from "lucide-react";
@@ -66,6 +67,7 @@ function PrayerGate({ onProceed }: { onProceed: () => void }) {
 export default function Chat() {
   const { matchId } = useParams<{ matchId: string }>();
   const { user } = useAuth();
+  const { isDemoMode, getDemoMessages, addDemoMessage, demoMatches } = useDemoMode();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMsg, setNewMsg] = useState("");
   const [partnerId, setPartnerId] = useState<string | null>(null);
@@ -78,7 +80,31 @@ export default function Chat() {
   const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  // Demo mode: skip gate, load demo data
   useEffect(() => {
+    if (!isDemoMode || !matchId) return;
+    const match = demoMatches.find(m => m.matchId === matchId);
+    if (match) {
+      setPartnerId(match.partnerId);
+      setPartnerName(match.partnerName);
+    }
+    setHasPrayed(true);
+    setGateLoading(false);
+  }, [isDemoMode, matchId, demoMatches]);
+
+  // Demo messages polling
+  useEffect(() => {
+    if (!isDemoMode || !matchId) return;
+    const interval = setInterval(() => {
+      setMessages(getDemoMessages(matchId));
+    }, 500);
+    setMessages(getDemoMessages(matchId));
+    return () => clearInterval(interval);
+  }, [isDemoMode, matchId, getDemoMessages]);
+
+  // Real mode: gate
+  useEffect(() => {
+    if (isDemoMode) return;
     if (!matchId || !user) return;
     (async () => {
       const { data } = await supabase
@@ -90,16 +116,17 @@ export default function Chat() {
       setHasPrayed(data?.prayed === true);
       setGateLoading(false);
     })();
-  }, [matchId, user]);
+  }, [matchId, user, isDemoMode]);
 
   useEffect(() => {
+    if (isDemoMode) return;
     if (!user) return;
     (async () => {
       const { data } = await supabase
         .from("profiles")
         .select("daily_message_count, last_like_reset")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
       if (data) {
         const lastReset = new Date(data.last_like_reset);
         const now = new Date();
@@ -110,9 +137,10 @@ export default function Chat() {
         }
       }
     })();
-  }, [user]);
+  }, [user, isDemoMode]);
 
   useEffect(() => {
+    if (isDemoMode) return;
     if (!matchId || !user || !hasPrayed) return;
     loadMatch();
     loadMessages();
@@ -125,13 +153,17 @@ export default function Chat() {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [matchId, user, hasPrayed]);
+  }, [matchId, user, hasPrayed, isDemoMode]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   async function handleProceed() {
+    if (isDemoMode) {
+      setHasPrayed(true);
+      return;
+    }
     if (!matchId || !user) return;
     await supabase.from("match_gate").upsert({
       match_id: matchId,
@@ -161,8 +193,27 @@ export default function Chat() {
     setMessages(data || []);
   }
 
-  async function sendMessage(e: React.FormEvent) {
+  function sendMessage(e: React.FormEvent) {
     e.preventDefault();
+    if (!newMsg.trim() || !matchId || sending) return;
+
+    if (isDemoMode) {
+      const filtered = filterMessage(newMsg);
+      setNewMsg("");
+      addDemoMessage(matchId, {
+        id: `user-${Date.now()}`,
+        sender_id: "current-user",
+        body: filtered,
+        created_at: new Date().toISOString(),
+      });
+      setDailyMsgCount(prev => prev + 1);
+      return;
+    }
+
+    sendMessageReal();
+  }
+
+  async function sendMessageReal() {
     if (!newMsg.trim() || !matchId || !user || sending) return;
 
     if (dailyMsgCount >= 50) {
@@ -194,6 +245,12 @@ export default function Chat() {
 
   async function submitReport() {
     if (!user || !partnerId || !reportReason.trim()) return;
+    if (isDemoMode) {
+      toast({ title: "Denúncia enviada (demo)" });
+      setReportOpen(false);
+      setReportReason("");
+      return;
+    }
     await supabase.from("reports").insert({
       reporter_id: user.id,
       reported_id: partnerId,
@@ -203,6 +260,8 @@ export default function Chat() {
     setReportOpen(false);
     setReportReason("");
   }
+
+  const currentUserId = user?.id || "current-user";
 
   if (gateLoading) {
     return (
@@ -259,16 +318,16 @@ export default function Chat() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.15 }}
-              className={`flex ${m.sender_id === user?.id ? "justify-end" : "justify-start"}`}
+              className={`flex ${m.sender_id === currentUserId ? "justify-end" : "justify-start"}`}
             >
               <div className={`max-w-[70%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                m.sender_id === user?.id
+                m.sender_id === currentUserId
                   ? "bg-foreground text-background rounded-br-md"
                   : "bg-muted text-foreground rounded-bl-md"
               }`}>
                 {m.body}
                 <div className={`mt-1 text-[10px] ${
-                  m.sender_id === user?.id ? "text-background/40" : "text-muted-foreground/50"
+                  m.sender_id === currentUserId ? "text-background/40" : "text-muted-foreground/50"
                 }`}>
                   {new Date(m.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
                 </div>
