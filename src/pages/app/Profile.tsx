@@ -12,12 +12,15 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { ShieldCheck, UserCheck } from "lucide-react";
+import { StatusBadge } from "@/components/StatusBadge";
+import { ProfileExpanded } from "@/components/ProfileExpanded";
 
 export default function Profile() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [inviterName, setInviterName] = useState<string | null>(null);
+  const [statusLevel, setStatusLevel] = useState("new");
   const [form, setForm] = useState({
     full_name: "",
     age: "",
@@ -27,6 +30,9 @@ export default function Profile() {
     marriage_intent: true,
     wants_children: false,
     gender: "",
+    family_vision: "",
+    spiritual_routine: "",
+    life_goals: "",
   });
 
   useEffect(() => {
@@ -47,9 +53,12 @@ export default function Profile() {
         marriage_intent: data.marriage_intent ?? true,
         wants_children: data.wants_children ?? false,
         gender: data.gender || "",
+        family_vision: (data as any).family_vision || "",
+        spiritual_routine: (data as any).spiritual_routine || "",
+        life_goals: (data as any).life_goals || "",
       });
+      setStatusLevel((data as any).status_level || "new");
 
-      // Load inviter name for trust seal
       if ((data as any).invited_by) {
         const { data: inviter } = await supabase
           .from("profiles")
@@ -80,8 +89,11 @@ export default function Profile() {
       marriage_intent: form.marriage_intent,
       wants_children: form.wants_children,
       gender: form.gender,
+      family_vision: form.family_vision,
+      spiritual_routine: form.spiritual_routine,
+      life_goals: form.life_goals,
       updated_at: new Date().toISOString(),
-    });
+    } as any);
 
     setSaving(false);
     if (error) {
@@ -111,7 +123,10 @@ export default function Profile() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <h1 className="mb-4 font-serif text-3xl font-semibold text-foreground tracking-tight">Meu Perfil</h1>
+      <div className="flex items-center gap-3 mb-4">
+        <h1 className="font-display text-3xl font-semibold text-foreground tracking-tight">Meu Perfil</h1>
+        <StatusBadge level={statusLevel} size="md" />
+      </div>
 
       {inviterName && (
         <Card className="mb-6 border-accent/30 bg-accent/5">
@@ -131,9 +146,9 @@ export default function Profile() {
         </Card>
       )}
 
-      <Card className="border-border/60">
+      <Card className="border-border/60 mb-6">
         <CardHeader>
-          <CardTitle className="font-serif text-lg">Informações pessoais</CardTitle>
+          <CardTitle className="font-display text-lg">Informações pessoais</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSave} className="space-y-5">
@@ -165,40 +180,87 @@ export default function Profile() {
                 </Select>
               </div>
             </div>
+
             <div className="space-y-2">
               <Label className="text-xs font-medium text-muted-foreground">Testemunho</Label>
               <Textarea
-                rows={4}
+                rows={3}
                 value={form.testimony}
                 onChange={e => setForm(f => ({ ...f, testimony: e.target.value }))}
                 placeholder="Compartilhe um pouco da sua caminhada de fé..."
                 className="border-border/60 resize-none"
               />
             </div>
+
+            <div className="space-y-4 pt-2">
+              <h3 className="text-xs font-semibold tracking-[0.15em] uppercase text-muted-foreground">
+                Sobre mim
+              </h3>
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground">Visão de família</Label>
+                <Textarea
+                  rows={2}
+                  value={form.family_vision}
+                  onChange={e => setForm(f => ({ ...f, family_vision: e.target.value }))}
+                  placeholder="Como você imagina sua família no futuro..."
+                  className="border-border/60 resize-none"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground">Rotina espiritual</Label>
+                <Textarea
+                  rows={2}
+                  value={form.spiritual_routine}
+                  onChange={e => setForm(f => ({ ...f, spiritual_routine: e.target.value }))}
+                  placeholder="Como é sua rotina de oração e estudo..."
+                  className="border-border/60 resize-none"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-medium text-muted-foreground">Objetivos de vida</Label>
+                <Textarea
+                  rows={2}
+                  value={form.life_goals}
+                  onChange={e => setForm(f => ({ ...f, life_goals: e.target.value }))}
+                  placeholder="Quais seus maiores objetivos e sonhos..."
+                  className="border-border/60 resize-none"
+                />
+              </div>
+            </div>
+
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-2">
-                <Checkbox
-                  id="marriage"
-                  checked={form.marriage_intent}
-                  onCheckedChange={v => setForm(f => ({ ...f, marriage_intent: !!v }))}
-                />
+                <Checkbox id="marriage" checked={form.marriage_intent} onCheckedChange={v => setForm(f => ({ ...f, marriage_intent: !!v }))} />
                 <Label htmlFor="marriage" className="text-sm">Tenho intenção de casar</Label>
               </div>
               <div className="flex items-center gap-2">
-                <Checkbox
-                  id="children"
-                  checked={form.wants_children}
-                  onCheckedChange={v => setForm(f => ({ ...f, wants_children: !!v }))}
-                />
+                <Checkbox id="children" checked={form.wants_children} onCheckedChange={v => setForm(f => ({ ...f, wants_children: !!v }))} />
                 <Label htmlFor="children" className="text-sm">Desejo ter filhos</Label>
               </div>
             </div>
-            <Button type="submit" disabled={saving} className="w-full rounded-lg font-medium text-sm tracking-wide">
+
+            <Button type="submit" disabled={saving} className="w-full rounded-xl font-medium text-sm gold-gradient text-accent-foreground">
               {saving ? "Salvando..." : "Salvar perfil"}
             </Button>
           </form>
         </CardContent>
       </Card>
+
+      {/* Preview of expanded profile */}
+      {(form.family_vision || form.spiritual_routine || form.life_goals) && (
+        <Card className="border-border/60">
+          <CardHeader>
+            <CardTitle className="font-display text-lg">Prévia do perfil expandido</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ProfileExpanded
+              familyVision={form.family_vision}
+              spiritualRoutine={form.spiritual_routine}
+              lifeGoals={form.life_goals}
+            />
+          </CardContent>
+        </Card>
+      )}
     </motion.div>
   );
 }
