@@ -251,7 +251,7 @@ const Index = () => {
       </section>
 
       {/* Partners */}
-      <section className="py-32 px-6 border-t border-border">
+      <section id="parceiros" className="py-32 px-6 border-t border-border">
         <div className="mx-auto max-w-4xl">
           <motion.div
             className="mx-auto mb-6 h-px w-16 gold-gradient"
