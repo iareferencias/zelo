@@ -111,7 +111,26 @@ export default function Profile() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <h1 className="mb-6 font-serif text-3xl font-semibold text-foreground tracking-tight">Meu Perfil</h1>
+      <h1 className="mb-4 font-serif text-3xl font-semibold text-foreground tracking-tight">Meu Perfil</h1>
+
+      {inviterName && (
+        <Card className="mb-6 border-accent/30 bg-accent/5">
+          <CardContent className="flex items-center gap-3 py-4">
+            <ShieldCheck className="h-5 w-5 text-accent shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground">Selo de Confiança</p>
+              <p className="text-xs text-muted-foreground">
+                Convidado por <span className="font-medium text-foreground">{inviterName}</span>
+              </p>
+            </div>
+            <Badge variant="secondary" className="text-xs gap-1">
+              <UserCheck className="h-3 w-3" />
+              Verificado
+            </Badge>
+          </CardContent>
+        </Card>
+      )}
+
       <Card className="border-border/60">
         <CardHeader>
           <CardTitle className="font-serif text-lg">Informações pessoais</CardTitle>
