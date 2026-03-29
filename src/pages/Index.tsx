@@ -1,5 +1,6 @@
-import { motion } from "framer-motion";
-import { ArrowRight, Shield, Heart, Clock, Eye, Handshake, MessageCircle } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Shield, Heart, Clock, Eye, Handshake, MessageCircle, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import partnerVenue from "@/assets/partner-venue.jpg";
