@@ -1,4 +1,4 @@
-import { Users, Heart, BookOpen, User, Shield, LogOut, Ticket, LayoutDashboard, Bell, ScrollText, Handshake } from "lucide-react";
+import { Users, Heart, BookOpen, User, Shield, LogOut, Ticket, LayoutDashboard, Bell, ScrollText, Handshake, Crown } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -21,6 +21,7 @@ const menuItems = [
   { title: "Notificações", url: "/app/notifications", icon: Bell },
   { title: "Preparação", url: "/app/preparacao", icon: BookOpen },
   { title: "Perfil", url: "/app/profile", icon: User },
+  { title: "Planos", url: "/app/plans", icon: Crown },
 ];
 
 export function AppSidebar() {

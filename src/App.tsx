@@ -16,6 +16,7 @@ import Chat from "./pages/app/Chat";
 import Profile from "./pages/app/Profile";
 import Preparacao from "./pages/app/Preparacao";
 import Notifications from "./pages/app/Notifications";
+import Plans from "./pages/app/Plans";
 import AdminDashboard from "./pages/app/admin/AdminDashboard";
 import AdminUsers from "./pages/app/admin/AdminUsers";
 import AdminReports from "./pages/app/admin/AdminReports";
@@ -48,6 +49,7 @@ const App = () => (
               <Route path="profile" element={<Profile />} />
               <Route path="preparacao" element={<Preparacao />} />
               <Route path="notifications" element={<Notifications />} />
+              <Route path="plans" element={<Plans />} />
               <Route path="admin/dashboard" element={<AdminDashboard />} />
               <Route path="admin/users" element={<AdminUsers />} />
               <Route path="admin/reports" element={<AdminReports />} />
