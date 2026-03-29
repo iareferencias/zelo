@@ -1,4 +1,4 @@
-import { Users, Heart, BookOpen, User, Shield, LogOut, Ticket, LayoutDashboard, Bell, ScrollText, Handshake, Crown } from "lucide-react";
+import { Users, Heart, BookOpen, User, Shield, LogOut, Ticket, LayoutDashboard, Bell, ScrollText, Handshake, Crown, TreePine } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -71,6 +71,7 @@ export function AppSidebar() {
                   { title: "Denúncias", url: "/app/admin/reports", icon: Shield },
                   { title: "Convites", url: "/app/admin/invites", icon: Ticket },
                   { title: "Auditoria", url: "/app/admin/audit", icon: ScrollText },
+                  { title: "Árvore de Convites", url: "/app/admin/invite-tree", icon: TreePine },
                 ].map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
