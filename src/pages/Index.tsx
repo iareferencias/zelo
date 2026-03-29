@@ -19,7 +19,26 @@ const fade = {
   }),
 };
 
+const menuSections = [
+  { id: "hero", label: "Início" },
+  { id: "manifesto", label: "Sobre" },
+  { id: "valores", label: "Valores" },
+  { id: "como-funciona", label: "Como funciona" },
+  { id: "parceiros", label: "Parceiros" },
+];
+
 const Index = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  function scrollTo(id: string) {
+    setMenuOpen(false);
+    if (id === "hero") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navbar */}
