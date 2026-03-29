@@ -17,6 +17,7 @@ export default function Profile() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [inviterName, setInviterName] = useState<string | null>(null);
   const [form, setForm] = useState({
     full_name: "",
     age: "",
@@ -47,6 +48,16 @@ export default function Profile() {
         wants_children: data.wants_children ?? false,
         gender: data.gender || "",
       });
+
+      // Load inviter name for trust seal
+      if ((data as any).invited_by) {
+        const { data: inviter } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", (data as any).invited_by)
+          .maybeSingle();
+        if (inviter) setInviterName(inviter.full_name);
+      }
     }
     setLoading(false);
   }
