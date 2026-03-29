@@ -65,6 +65,7 @@ export type Database = {
           horarios_disponiveis: Json | null
           id: number
           link_form_unico: string
+          logo_url: string | null
           nome: string
           percentual_comissao: number
           permitir_anexo: boolean
@@ -84,6 +85,7 @@ export type Database = {
           horarios_disponiveis?: Json | null
           id?: number
           link_form_unico: string
+          logo_url?: string | null
           nome: string
           percentual_comissao: number
           permitir_anexo?: boolean
@@ -103,6 +105,7 @@ export type Database = {
           horarios_disponiveis?: Json | null
           id?: number
           link_form_unico?: string
+          logo_url?: string | null
           nome?: string
           percentual_comissao?: number
           permitir_anexo?: boolean
@@ -123,6 +126,7 @@ export type Database = {
       click_tracking: {
         Row: {
           campanha_id: number
+          criada_em: string | null
           criado_em: string
           id: number
           ip_address: string
@@ -131,6 +135,7 @@ export type Database = {
         }
         Insert: {
           campanha_id: number
+          criada_em?: string | null
           criado_em?: string
           id?: number
           ip_address: string
@@ -139,6 +144,7 @@ export type Database = {
         }
         Update: {
           campanha_id?: number
+          criada_em?: string | null
           criado_em?: string
           id?: number
           ip_address?: string
@@ -521,6 +527,7 @@ export type Database = {
           atualizado_em: string
           campanha_id: number
           closed_value: number | null
+          codigo_indicacao: string | null
           commission_paid_at: string | null
           commission_released_at: string | null
           commission_status: Database["public"]["Enums"]["CommissionStatus"]
@@ -532,10 +539,12 @@ export type Database = {
           instagram_indicado: string | null
           is_interno: boolean
           is_perdido: boolean
+          lead_pai_id: number | null
           motivo_perdido: string | null
           nome: string
           obs_interna: string | null
           observacao: string | null
+          origem: string | null
           payment_received_at: string | null
           payment_status: Database["public"]["Enums"]["PaymentStatus"]
           perdido_em: string | null
@@ -554,6 +563,7 @@ export type Database = {
           atualizado_em: string
           campanha_id: number
           closed_value?: number | null
+          codigo_indicacao?: string | null
           commission_paid_at?: string | null
           commission_released_at?: string | null
           commission_status?: Database["public"]["Enums"]["CommissionStatus"]
@@ -565,10 +575,12 @@ export type Database = {
           instagram_indicado?: string | null
           is_interno?: boolean
           is_perdido?: boolean
+          lead_pai_id?: number | null
           motivo_perdido?: string | null
           nome: string
           obs_interna?: string | null
           observacao?: string | null
+          origem?: string | null
           payment_received_at?: string | null
           payment_status?: Database["public"]["Enums"]["PaymentStatus"]
           perdido_em?: string | null
@@ -587,6 +599,7 @@ export type Database = {
           atualizado_em?: string
           campanha_id?: number
           closed_value?: number | null
+          codigo_indicacao?: string | null
           commission_paid_at?: string | null
           commission_released_at?: string | null
           commission_status?: Database["public"]["Enums"]["CommissionStatus"]
@@ -598,10 +611,12 @@ export type Database = {
           instagram_indicado?: string | null
           is_interno?: boolean
           is_perdido?: boolean
+          lead_pai_id?: number | null
           motivo_perdido?: string | null
           nome?: string
           obs_interna?: string | null
           observacao?: string | null
+          origem?: string | null
           payment_received_at?: string | null
           payment_status?: Database["public"]["Enums"]["PaymentStatus"]
           perdido_em?: string | null
@@ -620,6 +635,13 @@ export type Database = {
             columns: ["campanha_id"]
             isOneToOne: false
             referencedRelation: "campanhas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_lead_pai_id_fkey"
+            columns: ["lead_pai_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
             referencedColumns: ["id"]
           },
           {
@@ -940,6 +962,7 @@ export type Database = {
           assinatura_cancelada: boolean | null
           assinatura_id: string | null
           atualizado_em: string
+          avatar_url: string | null
           bank_account_number: string | null
           bank_account_type: string | null
           bank_agency: string | null
@@ -981,6 +1004,7 @@ export type Database = {
           assinatura_cancelada?: boolean | null
           assinatura_id?: string | null
           atualizado_em: string
+          avatar_url?: string | null
           bank_account_number?: string | null
           bank_account_type?: string | null
           bank_agency?: string | null
@@ -1022,6 +1046,7 @@ export type Database = {
           assinatura_cancelada?: boolean | null
           assinatura_id?: string | null
           atualizado_em?: string
+          avatar_url?: string | null
           bank_account_number?: string | null
           bank_account_type?: string | null
           bank_agency?: string | null
