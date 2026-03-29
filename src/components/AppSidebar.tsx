@@ -1,4 +1,4 @@
-import { Users, Heart, BookOpen, User, Shield, LogOut, Ticket, LayoutDashboard, Bell, ScrollText } from "lucide-react";
+import { Users, Heart, BookOpen, User, Shield, LogOut, Ticket, LayoutDashboard, Bell, ScrollText, Handshake } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -36,7 +36,7 @@ export function AppSidebar() {
     <Sidebar className="border-r border-border">
       <SidebarContent>
         <div className="px-5 py-6">
-          <span className="text-xs font-semibold tracking-[0.2em] text-foreground">ZELO</span>
+          <span className="font-display text-lg font-semibold text-foreground">Zelo</span>
         </div>
         <SidebarGroup>
           <SidebarGroupContent>
@@ -47,8 +47,8 @@ export function AppSidebar() {
                     <NavLink
                       to={item.url}
                       end={item.url === "/app"}
-                      className="text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors duration-100"
-                      activeClassName="text-foreground bg-muted font-medium"
+                      className="text-muted-foreground hover:text-foreground hover:bg-accent/5 transition-colors duration-150"
+                      activeClassName="text-foreground bg-accent/10 font-medium"
                     >
                       <item.icon className="mr-2.5 h-4 w-4" />
                       <span className="text-sm">{item.title}</span>
@@ -75,8 +75,8 @@ export function AppSidebar() {
                     <SidebarMenuButton asChild>
                       <NavLink
                         to={item.url}
-                        className="text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors duration-100"
-                        activeClassName="text-foreground bg-muted font-medium"
+                        className="text-muted-foreground hover:text-foreground hover:bg-accent/5 transition-colors duration-150"
+                        activeClassName="text-foreground bg-accent/10 font-medium"
                       >
                         <item.icon className="mr-2.5 h-4 w-4" />
                         <span className="text-sm">{item.title}</span>

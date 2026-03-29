@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Heart, MapPin, User } from "lucide-react";
+import { Heart, MapPin, User, ChevronRight, Users2, Handshake } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { EmptyState } from "@/components/EmptyState";
 import { GridSkeleton } from "@/components/Skeletons";
 
@@ -20,12 +20,16 @@ interface ProfileWithScore {
   reasons: string[];
 }
 
+type ConnectionMode = "relacionamento" | "amizade";
+
 export default function Compatibles() {
   const { user } = useAuth();
   const [profiles, setProfiles] = useState<ProfileWithScore[]>([]);
   const [loading, setLoading] = useState(true);
   const [todayLikes, setTodayLikes] = useState(0);
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [mode, setMode] = useState<ConnectionMode>("relacionamento");
 
   useEffect(() => {
     if (!user) return;
@@ -67,6 +71,7 @@ export default function Compatibles() {
 
     scored.sort((a, b) => b.score - a.score);
     setProfiles(scored);
+    setCurrentIndex(0);
     setLoading(false);
   }
 
@@ -109,7 +114,7 @@ export default function Compatibles() {
         { user_id: toUser, type: "match_created", reference_id: match?.id },
       ] as any);
       
-      toast({ title: "Match criado", description: "Vocês demonstraram interesse mútuo." });
+      toast({ title: "Match criado!", description: "Vocês demonstraram interesse mútuo." });
     } else {
       toast({ title: "Interesse demonstrado", description: "Aguardando reciprocidade." });
     }
@@ -118,99 +123,213 @@ export default function Compatibles() {
     setTodayLikes(prev => prev + 1);
   }
 
+  const goNext = useCallback(() => {
+    if (currentIndex < profiles.length - 1) {
+      setCurrentIndex(prev => prev + 1);
+    }
+  }, [currentIndex, profiles.length]);
+
+  const currentProfile = profiles[currentIndex];
+
   if (loading) {
     return (
       <div className="page-transition">
         <div className="mb-10">
-          <div className="skeleton-shimmer h-7 w-48 mb-2" />
+          <div className="skeleton-shimmer h-8 w-48 mb-2" />
           <div className="skeleton-shimmer h-4 w-32" />
         </div>
-        <GridSkeleton count={6} />
+        <div className="mx-auto max-w-md">
+          <div className="skeleton-shimmer h-[480px] rounded-2xl" />
+        </div>
       </div>
     );
   }
 
   return (
     <div className="page-transition">
-      <div className="mb-10 flex items-end justify-between">
+      {/* Header */}
+      <div className="mb-8 flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Compatíveis</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Ordenados por compatibilidade</p>
+          <h1 className="font-display text-3xl font-semibold text-foreground">Compatíveis</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {profiles.length > 0
+              ? `${currentIndex + 1} de ${profiles.length} perfis`
+              : "Nenhum perfil encontrado"}
+          </p>
         </div>
-        <span className="text-xs text-muted-foreground">
-          <span className="font-medium text-foreground">{todayLikes}</span>/3 hoje
-        </span>
+        <div className="flex items-center gap-3">
+          {/* Modo Conhecer toggle */}
+          <div className="flex rounded-full border border-border bg-card p-0.5">
+            <button
+              onClick={() => setMode("relacionamento")}
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
+                mode === "relacionamento"
+                  ? "gold-gradient text-accent-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Heart className="h-3 w-3" />
+              Relacionamento
+            </button>
+            <button
+              onClick={() => setMode("amizade")}
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all duration-200 ${
+                mode === "amizade"
+                  ? "gold-gradient text-accent-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Handshake className="h-3 w-3" />
+              Amizade
+            </button>
+          </div>
+          <span className="text-xs text-muted-foreground">
+            <span className="font-semibold text-accent">{todayLikes}</span>/3
+          </span>
+        </div>
       </div>
 
       {profiles.length === 0 ? (
         <EmptyState type="compatibles" />
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {profiles.map((p, i) => (
-            <motion.div
-              key={p.id}
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: i * 0.04, duration: 0.2 }}
-            >
-              <div className="rounded-xl border border-border bg-card p-6 card-hover">
-                {/* Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-semibold text-foreground leading-tight">
-                        {p.full_name || "Sem nome"}
-                      </h3>
-                      <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
-                        {p.age && <span>{p.age}</span>}
-                        {p.city && (
-                          <span className="flex items-center gap-0.5">
-                            <MapPin className="h-3 w-3" />{p.city}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <span className="text-xs font-medium text-muted-foreground">{p.score}%</span>
-                </div>
-
-                {/* Reasons */}
-                {p.reasons.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {p.reasons.slice(0, 3).map((r, idx) => (
-                      <span key={idx} className="rounded-full border border-border px-2.5 py-0.5 text-[11px] text-muted-foreground">
-                        {r}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                {/* Testimony */}
-                {p.testimony && (
-                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-4">
-                    {p.testimony}
-                  </p>
-                )}
-
-                {/* CTA */}
-                <Button
-                  size="sm"
-                  variant={likedIds.has(p.id) ? "outline" : "default"}
-                  className="w-full text-xs font-medium"
-                  disabled={likedIds.has(p.id) || todayLikes >= 3}
-                  onClick={() => handleLike(p.id)}
-                >
-                  <Heart className={`mr-1.5 h-3.5 w-3.5 ${likedIds.has(p.id) ? "fill-current" : ""}`} />
-                  {likedIds.has(p.id) ? "Interesse demonstrado" : "Demonstrar interesse"}
-                </Button>
-              </div>
-            </motion.div>
-          ))}
+        <div className="mx-auto max-w-md">
+          <AnimatePresence mode="wait">
+            {currentProfile && (
+              <ProfileCard
+                key={currentProfile.id}
+                profile={currentProfile}
+                isLiked={likedIds.has(currentProfile.id)}
+                canLike={todayLikes < 3}
+                onLike={() => handleLike(currentProfile.id)}
+                onNext={goNext}
+                hasNext={currentIndex < profiles.length - 1}
+                mode={mode}
+              />
+            )}
+          </AnimatePresence>
         </div>
       )}
     </div>
+  );
+}
+
+interface ProfileCardProps {
+  profile: ProfileWithScore;
+  isLiked: boolean;
+  canLike: boolean;
+  onLike: () => void;
+  onNext: () => void;
+  hasNext: boolean;
+  mode: ConnectionMode;
+}
+
+function ProfileCard({ profile, isLiked, canLike, onLike, onNext, hasNext, mode }: ProfileCardProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.96, y: 12 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.96, y: -12 }}
+      transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+      className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm"
+    >
+      {/* Score bar */}
+      <div className="px-6 pt-6 pb-4">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-medium text-muted-foreground">Compatibilidade</span>
+          <span className="font-display text-2xl font-semibold text-accent">{profile.score}%</span>
+        </div>
+        <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+          <motion.div
+            className="h-full rounded-full gold-gradient"
+            initial={{ width: 0 }}
+            animate={{ width: `${profile.score}%` }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+          />
+        </div>
+      </div>
+
+      {/* Profile info */}
+      <div className="px-6 pb-2">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
+            <User className="h-6 w-6 text-muted-foreground" />
+          </div>
+          <div>
+            <h2 className="font-display text-xl font-semibold text-foreground leading-tight">
+              {profile.full_name || "Sem nome"}
+            </h2>
+            <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+              {profile.age && <span>{profile.age} anos</span>}
+              {profile.city && (
+                <span className="flex items-center gap-0.5">
+                  <MapPin className="h-3 w-3" />{profile.city}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Congregation */}
+        {profile.congregation && (
+          <p className="text-xs text-muted-foreground mb-4">
+            <span className="font-medium text-foreground">Congregação:</span> {profile.congregation}
+          </p>
+        )}
+
+        {/* Reasons */}
+        {profile.reasons.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            {profile.reasons.map((r, idx) => (
+              <span
+                key={idx}
+                className="rounded-full border border-accent/20 bg-accent/5 px-3 py-1 text-[11px] font-medium text-accent"
+              >
+                {r}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Testimony */}
+        {profile.testimony && (
+          <div className="rounded-xl bg-muted/50 p-4 mb-4">
+            <p className="text-xs font-medium text-foreground mb-1">Testemunho</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              {profile.testimony}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Actions */}
+      <div className="flex gap-2 px-6 pb-6">
+        <Button
+          size="lg"
+          variant={isLiked ? "outline" : "default"}
+          className={`flex-1 text-sm font-medium rounded-xl ${
+            !isLiked ? "gold-gradient text-accent-foreground shadow-md hover:shadow-lg transition-shadow" : ""
+          }`}
+          disabled={isLiked || !canLike}
+          onClick={onLike}
+        >
+          <Heart className={`mr-2 h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
+          {isLiked
+            ? "Interesse demonstrado"
+            : mode === "amizade"
+              ? "Quero conhecer"
+              : "Demonstrar interesse"}
+        </Button>
+        {hasNext && (
+          <Button
+            size="lg"
+            variant="outline"
+            className="rounded-xl px-4"
+            onClick={onNext}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+    </motion.div>
   );
 }
