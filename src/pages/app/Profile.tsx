@@ -8,13 +8,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
+import { ShieldCheck, UserCheck } from "lucide-react";
 
 export default function Profile() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [inviterName, setInviterName] = useState<string | null>(null);
   const [form, setForm] = useState({
     full_name: "",
     age: "",
@@ -45,6 +48,16 @@ export default function Profile() {
         wants_children: data.wants_children ?? false,
         gender: data.gender || "",
       });
+
+      // Load inviter name for trust seal
+      if ((data as any).invited_by) {
+        const { data: inviter } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", (data as any).invited_by)
+          .maybeSingle();
+        if (inviter) setInviterName(inviter.full_name);
+      }
     }
     setLoading(false);
   }
@@ -98,7 +111,26 @@ export default function Profile() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <h1 className="mb-6 font-serif text-3xl font-semibold text-foreground tracking-tight">Meu Perfil</h1>
+      <h1 className="mb-4 font-serif text-3xl font-semibold text-foreground tracking-tight">Meu Perfil</h1>
+
+      {inviterName && (
+        <Card className="mb-6 border-accent/30 bg-accent/5">
+          <CardContent className="flex items-center gap-3 py-4">
+            <ShieldCheck className="h-5 w-5 text-accent shrink-0" />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground">Selo de Confiança</p>
+              <p className="text-xs text-muted-foreground">
+                Convidado por <span className="font-medium text-foreground">{inviterName}</span>
+              </p>
+            </div>
+            <Badge variant="secondary" className="text-xs gap-1">
+              <UserCheck className="h-3 w-3" />
+              Verificado
+            </Badge>
+          </CardContent>
+        </Card>
+      )}
+
       <Card className="border-border/60">
         <CardHeader>
           <CardTitle className="font-serif text-lg">Informações pessoais</CardTitle>

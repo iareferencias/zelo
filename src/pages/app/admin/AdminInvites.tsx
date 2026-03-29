@@ -124,21 +124,25 @@ export default function AdminInvites() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Código</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Criado em</TableHead>
-                    <TableHead>Ações</TableHead>
+                     <TableHead>Código</TableHead>
+                     <TableHead>Status</TableHead>
+                     <TableHead>Criado por</TableHead>
+                     <TableHead>Usado por</TableHead>
+                     <TableHead>Criado em</TableHead>
+                     <TableHead>Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {invites.slice(0, 50).map((inv) => (
                     <TableRow key={inv.id}>
                       <TableCell className="font-mono text-sm">{inv.code}</TableCell>
-                      <TableCell>
-                        <Badge variant={inv.status === "active" ? "default" : inv.status === "used" ? "secondary" : "destructive"}>
-                          {inv.status}
-                        </Badge>
-                      </TableCell>
+                       <TableCell>
+                         <Badge variant={inv.status === "active" ? "default" : inv.status === "used" ? "secondary" : "destructive"}>
+                           {inv.status}
+                         </Badge>
+                       </TableCell>
+                       <TableCell className="text-xs text-muted-foreground">{inv.created_by ? inv.created_by.substring(0, 8) + "..." : "Admin"}</TableCell>
+                       <TableCell className="text-xs text-muted-foreground">{inv.used_by ? inv.used_by.substring(0, 8) + "..." : "—"}</TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {new Date(inv.created_at).toLocaleDateString("pt-BR")}
                       </TableCell>
