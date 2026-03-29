@@ -1,7 +1,13 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Shield, Heart, Clock, Eye } from "lucide-react";
+import { ArrowRight, Shield, Heart, Clock, Eye, Handshake, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import partnerVenue from "@/assets/partner-venue.jpg";
+import partnerBridal from "@/assets/partner-bridal.jpg";
+import partnerSalon from "@/assets/partner-salon.jpg";
+import partnerEvent from "@/assets/partner-event.jpg";
+import partnerCake from "@/assets/partner-cake.jpg";
+import partnerPhoto from "@/assets/partner-photo.jpg";
 
 const fade = {
   hidden: { opacity: 0, y: 10 },
@@ -187,6 +193,100 @@ const Index = () => {
             </Link>
           </Button>
         </motion.div>
+      </section>
+
+      {/* Partners */}
+      <section className="py-32 px-6 border-t border-border">
+        <div className="mx-auto max-w-4xl">
+          <motion.div
+            className="mx-auto mb-6 h-px w-16 gold-gradient"
+            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0}
+          />
+          <motion.div
+            className="text-center mb-4"
+            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}
+          >
+            <div className="inline-flex items-center gap-2 mb-4 px-4 py-1.5 rounded-full border border-accent/30 bg-accent/5">
+              <Handshake className="h-4 w-4 text-accent" />
+              <span className="text-xs font-medium tracking-wider uppercase text-accent">Em breve</span>
+            </div>
+          </motion.div>
+          <motion.h2
+            className="mb-4 text-center font-display text-3xl font-semibold text-foreground sm:text-4xl"
+            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}
+          >
+            Grandes parceiros com o Zelo
+          </motion.h2>
+          <motion.p
+            className="mx-auto mb-16 max-w-lg text-center text-sm leading-relaxed text-muted-foreground"
+            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={3}
+          >
+            Estamos construindo uma rede de parceiros da CCB para oferecer tudo que você precisa — do noivado ao altar.
+          </motion.p>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {[
+              { img: partnerVenue, label: "Espaços para Cerimônia" },
+              { img: partnerBridal, label: "Vestidos de Noiva" },
+              { img: partnerSalon, label: "Salões de Beleza" },
+              { img: partnerEvent, label: "Cerimonialistas" },
+              { img: partnerCake, label: "Confeitaria & Bolos" },
+              { img: partnerPhoto, label: "Fotógrafos" },
+            ].map((partner, i) => (
+              <motion.div
+                key={partner.label}
+                className="group relative overflow-hidden rounded-xl aspect-square"
+                initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i * 0.5}
+              >
+                <img
+                  src={partner.img}
+                  alt={partner.label}
+                  loading="lazy"
+                  width={640}
+                  height={640}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                  <p className="text-sm font-medium text-white">{partner.label}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* CTA Empreendedor */}
+          <motion.div
+            className="mt-16 rounded-2xl border border-accent/20 bg-card p-8 md:p-10 text-center"
+            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={4}
+          >
+            <p className="text-xs font-medium tracking-[0.25em] uppercase text-accent mb-3">
+              Para empreendedores
+            </p>
+            <h3 className="font-display text-2xl font-semibold text-foreground mb-3">
+              Você é desse ramo?
+            </h3>
+            <p className="mx-auto max-w-md text-sm leading-relaxed text-muted-foreground mb-6">
+              Se você é cerimonialista, tem salão de beleza, loja de vestidos, buffet, fotógrafo ou qualquer serviço voltado para casamentos — entre na nossa fila de espera de parceiros.
+            </p>
+            <Button
+              size="lg"
+              className="rounded-full gold-gradient px-10 py-6 text-sm font-medium tracking-wide text-accent-foreground shadow-lg hover:shadow-xl transition-shadow duration-300"
+              asChild
+            >
+              <a
+                href="https://wa.me/5519974151947?text=Olá!%20Tenho%20interesse%20em%20ser%20parceiro%20do%20Zelo."
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <MessageCircle className="mr-2 h-4 w-4" />
+                Falar pelo WhatsApp
+              </a>
+            </Button>
+            <p className="mt-4 text-xs text-muted-foreground">
+              (19) 97415-1947
+            </p>
+          </motion.div>
+        </div>
       </section>
 
       {/* Footer */}
