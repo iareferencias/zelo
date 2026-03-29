@@ -250,30 +250,108 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-32 px-6">
-        <motion.div
-          className="mx-auto max-w-md text-center"
-          initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0}
-        >
-          <h2 className="mb-4 font-display text-3xl font-semibold text-foreground sm:text-4xl">
-            Pronto pra dar esse passo?
-          </h2>
-          <p className="mb-10 text-sm text-muted-foreground">
-            Entre pra uma comunidade que valoriza o que você valoriza.
-          </p>
-          <Button
-            size="lg"
-            className="rounded-full gold-gradient px-12 py-6 text-sm font-medium tracking-wide text-accent-foreground shadow-lg hover:shadow-xl transition-shadow duration-300"
-            asChild
+      {/* Planos */}
+      <section id="planos" className="py-32 px-6 border-t border-border">
+        <div className="mx-auto max-w-3xl">
+          <motion.div
+            className="mx-auto mb-6 h-px w-16 gold-gradient"
+            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0}
+          />
+          <motion.h2
+            className="mb-4 text-center font-display text-3xl font-semibold text-foreground sm:text-4xl"
+            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1}
           >
-            <Link to="/waitlist">
-              Solicitar convite
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        </motion.div>
+            Escolha seu plano
+          </motion.h2>
+          <motion.p
+            className="mx-auto mb-14 max-w-md text-center text-sm leading-relaxed text-muted-foreground"
+            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2}
+          >
+            Encontre conexões verdadeiras. Escolha o plano ideal para sua jornada no Zelo.
+          </motion.p>
+
+          <div className="grid gap-6 sm:grid-cols-2">
+            {/* FREE */}
+            <motion.div
+              initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={3}
+              className="rounded-2xl border border-border/60 bg-card p-6 sm:p-8 flex flex-col"
+            >
+              <h3 className="font-display text-2xl font-semibold text-foreground mb-1">Free</h3>
+              <div className="flex items-baseline gap-1 mb-2">
+                <span className="text-3xl font-semibold text-foreground">R$ 0</span>
+                <span className="text-sm text-muted-foreground">/mês</span>
+              </div>
+              <p className="text-xs text-muted-foreground mb-6">
+                Comece sua jornada com recursos essenciais.
+              </p>
+              <ul className="space-y-3 flex-1">
+                {freeBenefits.map((b, i) => (
+                  <li key={i} className="flex items-center gap-2.5 text-sm">
+                    {b.included ? (
+                      <Check className="h-4 w-4 text-accent shrink-0" />
+                    ) : (
+                      <X className="h-4 w-4 text-muted-foreground/40 shrink-0" />
+                    )}
+                    <span className={b.included ? "text-foreground" : "text-muted-foreground/50"}>
+                      {b.text}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <Button variant="outline" className="w-full mt-6 rounded-lg" asChild>
+                <Link to="/waitlist">Começar grátis</Link>
+              </Button>
+            </motion.div>
+
+            {/* ZELO+ */}
+            <motion.div
+              initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={4}
+              className="relative rounded-2xl border border-accent/30 bg-card p-6 sm:p-8 flex flex-col overflow-hidden"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-accent/5 pointer-events-none" />
+              <div className="relative flex-1 flex flex-col">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-display text-2xl font-semibold text-foreground">Zelo+</h3>
+                  <Crown className="h-5 w-5 text-accent" />
+                </div>
+                <div className="inline-flex items-center gap-1 mb-2 w-fit px-2.5 py-0.5 rounded-full gold-gradient">
+                  <Sparkles className="h-3 w-3 text-accent-foreground" />
+                  <span className="text-[10px] font-medium tracking-wider uppercase text-accent-foreground">Recomendado</span>
+                </div>
+                <div className="flex items-baseline gap-1 mb-2">
+                  <span className="text-3xl font-semibold gold-text">R$ 19,70</span>
+                  <span className="text-sm text-muted-foreground">/mês</span>
+                </div>
+                <p className="text-xs text-muted-foreground mb-6">
+                  Desbloqueie tudo e encontre sua conexão com propósito.
+                </p>
+                <ul className="space-y-3 flex-1">
+                  {plusBenefits.map((b, i) => (
+                    <li key={i} className="flex items-center gap-2.5 text-sm">
+                      <Check className="h-4 w-4 text-accent shrink-0" />
+                      <span className="text-foreground">{b.text}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button
+                  className="w-full mt-6 rounded-lg gold-gradient text-accent-foreground font-medium hover:opacity-90 transition-opacity"
+                  asChild
+                >
+                  <Link to="/waitlist">
+                    <Crown className="h-4 w-4 mr-1.5" />
+                    Quero o Zelo+
+                  </Link>
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+
+          <p className="text-center text-xs text-muted-foreground mt-8">
+            Cancele quando quiser. Sem surpresas, sem burocracia.
+          </p>
+        </div>
       </section>
+
 
       {/* Partners */}
       <section id="parceiros" className="py-32 px-6 border-t border-border">
