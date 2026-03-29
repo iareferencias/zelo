@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useDemoMode } from "@/hooks/useDemoMode";
 import { Button } from "@/components/ui/button";
-import { Heart, MapPin, User, ChevronRight, Users2, Handshake } from "lucide-react";
+import { Heart, MapPin, User, ChevronRight, Handshake } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { EmptyState } from "@/components/EmptyState";
@@ -24,6 +25,7 @@ type ConnectionMode = "relacionamento" | "amizade";
 
 export default function Compatibles() {
   const { user } = useAuth();
+  const { isDemoMode, demoProfiles, demoLikedIds, addDemoLike, demoTodayLikes } = useDemoMode();
   const [profiles, setProfiles] = useState<ProfileWithScore[]>([]);
   const [loading, setLoading] = useState(true);
   const [todayLikes, setTodayLikes] = useState(0);
@@ -32,9 +34,15 @@ export default function Compatibles() {
   const [mode, setMode] = useState<ConnectionMode>("relacionamento");
 
   useEffect(() => {
+    if (isDemoMode) {
+      setProfiles(demoProfiles);
+      setCurrentIndex(0);
+      setLoading(false);
+      return;
+    }
     if (!user) return;
     loadData();
-  }, [user]);
+  }, [user, isDemoMode]);
 
   async function loadData() {
     if (!user) return;
@@ -75,7 +83,24 @@ export default function Compatibles() {
     setLoading(false);
   }
 
-  async function handleLike(toUser: string) {
+  function handleLike(toUser: string) {
+    if (isDemoMode) {
+      if (demoTodayLikes >= 3) {
+        toast({ title: "Limite atingido", description: "Até 3 interesses por dia.", variant: "destructive" });
+        return;
+      }
+      const isMutual = addDemoLike(toUser);
+      if (isMutual) {
+        toast({ title: "🎉 Match criado!", description: "Vocês demonstraram interesse mútuo! Veja em Matches." });
+      } else {
+        toast({ title: "Interesse demonstrado", description: "Aguardando reciprocidade." });
+      }
+      return;
+    }
+    handleLikeReal(toUser);
+  }
+
+  async function handleLikeReal(toUser: string) {
     if (!user) return;
     if (todayLikes >= 3) {
       toast({ title: "Limite atingido", description: "Você pode demonstrar interesse em até 3 pessoas por dia.", variant: "destructive" });
@@ -108,12 +133,12 @@ export default function Compatibles() {
     if (mutual) {
       const [a, b] = [user.id, toUser].sort();
       const { data: match } = await supabase.from("matches").insert({ user_a: a, user_b: b }).select("id").single();
-      
+
       await supabase.from("notifications").insert([
         { user_id: user.id, type: "match_created", reference_id: match?.id },
         { user_id: toUser, type: "match_created", reference_id: match?.id },
       ] as any);
-      
+
       toast({ title: "Match criado!", description: "Vocês demonstraram interesse mútuo." });
     } else {
       toast({ title: "Interesse demonstrado", description: "Aguardando reciprocidade." });
@@ -130,6 +155,8 @@ export default function Compatibles() {
   }, [currentIndex, profiles.length]);
 
   const currentProfile = profiles[currentIndex];
+  const activeLikedIds = isDemoMode ? demoLikedIds : likedIds;
+  const activeTodayLikes = isDemoMode ? demoTodayLikes : todayLikes;
 
   if (loading) {
     return (
@@ -147,7 +174,6 @@ export default function Compatibles() {
 
   return (
     <div className="page-transition">
-      {/* Header */}
       <div className="mb-8 flex items-end justify-between">
         <div>
           <h1 className="font-display text-3xl font-semibold text-foreground">Compatíveis</h1>
@@ -158,7 +184,6 @@ export default function Compatibles() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          {/* Modo Conhecer toggle */}
           <div className="flex rounded-full border border-border bg-card p-0.5">
             <button
               onClick={() => setMode("relacionamento")}
@@ -184,7 +209,7 @@ export default function Compatibles() {
             </button>
           </div>
           <span className="text-xs text-muted-foreground">
-            <span className="font-semibold text-accent">{todayLikes}</span>/3
+            <span className="font-semibold text-accent">{activeTodayLikes}</span>/3
           </span>
         </div>
       </div>
@@ -198,8 +223,8 @@ export default function Compatibles() {
               <ProfileCard
                 key={currentProfile.id}
                 profile={currentProfile}
-                isLiked={likedIds.has(currentProfile.id)}
-                canLike={todayLikes < 3}
+                isLiked={activeLikedIds.has(currentProfile.id)}
+                canLike={activeTodayLikes < 3}
                 onLike={() => handleLike(currentProfile.id)}
                 onNext={goNext}
                 hasNext={currentIndex < profiles.length - 1}
@@ -232,7 +257,6 @@ function ProfileCard({ profile, isLiked, canLike, onLike, onNext, hasNext, mode 
       transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
       className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm"
     >
-      {/* Score bar */}
       <div className="px-6 pt-6 pb-4">
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs font-medium text-muted-foreground">Compatibilidade</span>
@@ -248,7 +272,6 @@ function ProfileCard({ profile, isLiked, canLike, onLike, onNext, hasNext, mode 
         </div>
       </div>
 
-      {/* Profile info */}
       <div className="px-6 pb-2">
         <div className="flex items-center gap-4 mb-4">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
@@ -269,14 +292,12 @@ function ProfileCard({ profile, isLiked, canLike, onLike, onNext, hasNext, mode 
           </div>
         </div>
 
-        {/* Congregation */}
         {profile.congregation && (
           <p className="text-xs text-muted-foreground mb-4">
             <span className="font-medium text-foreground">Congregação:</span> {profile.congregation}
           </p>
         )}
 
-        {/* Reasons */}
         {profile.reasons.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-4">
             {profile.reasons.map((r, idx) => (
@@ -290,7 +311,6 @@ function ProfileCard({ profile, isLiked, canLike, onLike, onNext, hasNext, mode 
           </div>
         )}
 
-        {/* Testimony */}
         {profile.testimony && (
           <div className="rounded-xl bg-muted/50 p-4 mb-4">
             <p className="text-xs font-medium text-foreground mb-1">Testemunho</p>
@@ -301,7 +321,6 @@ function ProfileCard({ profile, isLiked, canLike, onLike, onNext, hasNext, mode 
         )}
       </div>
 
-      {/* Actions */}
       <div className="flex gap-2 px-6 pb-6">
         <Button
           size="lg"

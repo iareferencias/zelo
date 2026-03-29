@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useDemoMode } from "@/hooks/useDemoMode";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, MapPin, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -18,14 +19,20 @@ interface MatchWithProfile {
 
 export default function Matches() {
   const { user } = useAuth();
+  const { isDemoMode, demoMatches } = useDemoMode();
   const navigate = useNavigate();
   const [matches, setMatches] = useState<MatchWithProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (isDemoMode) {
+      setMatches(demoMatches);
+      setLoading(false);
+      return;
+    }
     if (!user) return;
     loadMatches();
-  }, [user]);
+  }, [user, isDemoMode, demoMatches]);
 
   async function loadMatches() {
     if (!user) return;
