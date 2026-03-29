@@ -38,7 +38,7 @@ export default function Signup() {
     // 1. Verificar convite
     const { data: invite, error: invErr } = await supabase
       .from("invites")
-      .select("id, status")
+      .select("id, status, created_by, tree_depth")
       .eq("code", code)
       .eq("status", "active")
       .maybeSingle();
@@ -57,13 +57,21 @@ export default function Signup() {
       return;
     }
 
-    // 3. Marcar convite como usado
+    // 3. Marcar convite como usado e rastrear árvore
     const userId = signUpData?.user?.id;
     if (userId) {
       await supabase
         .from("invites")
-        .update({ used_by: userId, status: "used" })
+        .update({ used_by: userId, status: "used", used_at: new Date().toISOString() })
         .eq("id", invite.id);
+
+      // Atualizar perfil com quem convidou e profundidade na árvore
+      const invitedBy = invite.created_by;
+      const newDepth = (invite.tree_depth ?? 0) + 1;
+      await supabase
+        .from("profiles")
+        .update({ invited_by: invitedBy, invite_tree_depth: newDepth })
+        .eq("id", userId);
     }
 
     setLoading(false);
