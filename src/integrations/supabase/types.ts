@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          admin_id: string | null
+          created_at: string
+          details: Json | null
+          id: string
+          target_user_id: string | null
+        }
+        Insert: {
+          action: string
+          admin_id?: string | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_user_id?: string | null
+        }
+        Update: {
+          action?: string
+          admin_id?: string | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_user_id?: string | null
+        }
+        Relationships: []
+      }
       campanha_disponibilidade: {
         Row: {
           active: boolean | null
@@ -476,6 +503,42 @@ export type Database = {
           },
         ]
       }
+      invites: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          id: string
+          status: string
+          tree_depth: number
+          used_at: string | null
+          used_by: string | null
+          voucher_text: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          status?: string
+          tree_depth?: number
+          used_at?: string | null
+          used_by?: string | null
+          voucher_text?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          status?: string
+          tree_depth?: number
+          used_at?: string | null
+          used_by?: string | null
+          voucher_text?: string | null
+        }
+        Relationships: []
+      }
       lead_historico: {
         Row: {
           acao: string
@@ -777,6 +840,38 @@ export type Database = {
           },
         ]
       }
+      messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          match_id: string
+          sender_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          match_id: string
+          sender_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          match_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notificacoes: {
         Row: {
           criada_em: string
@@ -862,6 +957,8 @@ export type Database = {
           full_name: string
           gender: string | null
           id: string
+          invite_tree_depth: number | null
+          invited_by: string | null
           marriage_intent: boolean | null
           onboarding_complete: boolean | null
           testimony: string | null
@@ -878,6 +975,8 @@ export type Database = {
           full_name?: string
           gender?: string | null
           id: string
+          invite_tree_depth?: number | null
+          invited_by?: string | null
           marriage_intent?: boolean | null
           onboarding_complete?: boolean | null
           testimony?: string | null
@@ -894,6 +993,8 @@ export type Database = {
           full_name?: string
           gender?: string | null
           id?: string
+          invite_tree_depth?: number | null
+          invited_by?: string | null
           marriage_intent?: boolean | null
           onboarding_complete?: boolean | null
           testimony?: string | null
@@ -932,6 +1033,36 @@ export type Database = {
           status?: string | null
           supabase_project_id?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          created_at: string
+          details: string | null
+          id: string
+          reason: string
+          reported_id: string
+          reporter_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason: string
+          reported_id: string
+          reporter_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          id?: string
+          reason?: string
+          reported_id?: string
+          reporter_id?: string
+          status?: string
         }
         Relationships: []
       }
@@ -1037,6 +1168,27 @@ export type Database = {
           created_at?: string | null
           id?: string
           name?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role_zelo"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role_zelo"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role_zelo"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -1204,6 +1356,33 @@ export type Database = {
         }
         Relationships: []
       }
+      waitlist: {
+        Row: {
+          city: string | null
+          congregation: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string
+        }
+        Insert: {
+          city?: string | null
+          congregation?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+        }
+        Update: {
+          city?: string | null
+          congregation?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       sms_templates: {
@@ -1241,9 +1420,28 @@ export type Database = {
       }
       exec_sql: { Args: { query: string }; Returns: undefined }
       exec_sql_query: { Args: { query: string }; Returns: Json }
+      get_invite_tree: {
+        Args: { root_user_id: string }
+        Returns: {
+          congregation: string
+          created_at: string
+          full_name: string
+          invite_tree_depth: number
+          invited_by: string
+          user_id: string
+        }[]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role_zelo"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "owner" | "admin" | "member" | "super_admin"
+      app_role_zelo: "admin" | "moderator" | "user"
       CategoriaCupom: "INTERNO" | "PUBLICO"
       CommissionStatus: "BLOQUEADA" | "LIBERADA" | "PAGA"
       DuracaoDesconto: "UMA_VEZ" | "REPETICAO" | "PARA_SEMPRE"
@@ -1407,6 +1605,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["owner", "admin", "member", "super_admin"],
+      app_role_zelo: ["admin", "moderator", "user"],
       CategoriaCupom: ["INTERNO", "PUBLICO"],
       CommissionStatus: ["BLOQUEADA", "LIBERADA", "PAGA"],
       DuracaoDesconto: ["UMA_VEZ", "REPETICAO", "PARA_SEMPRE"],
