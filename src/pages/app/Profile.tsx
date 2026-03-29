@@ -33,7 +33,7 @@ export default function Profile() {
 
   async function loadProfile() {
     if (!user) return;
-    const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+    const { data } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
     if (data) {
       setForm({
         full_name: data.full_name || "",
@@ -57,7 +57,8 @@ export default function Profile() {
       return;
     }
     setSaving(true);
-    const { error } = await supabase.from("profiles").update({
+    const { error } = await supabase.from("profiles").upsert({
+      id: user.id,
       full_name: form.full_name,
       age: form.age ? parseInt(form.age) : null,
       city: form.city,
@@ -66,7 +67,8 @@ export default function Profile() {
       marriage_intent: form.marriage_intent,
       wants_children: form.wants_children,
       gender: form.gender,
-    }).eq("id", user.id);
+      updated_at: new Date().toISOString(),
+    });
 
     setSaving(false);
     if (error) {

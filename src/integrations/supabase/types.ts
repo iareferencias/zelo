@@ -782,6 +782,54 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          age: number | null
+          avatar_url: string | null
+          city: string | null
+          congregation: string | null
+          created_at: string
+          full_name: string
+          gender: string | null
+          id: string
+          marriage_intent: boolean | null
+          onboarding_complete: boolean | null
+          testimony: string | null
+          updated_at: string
+          wants_children: boolean | null
+        }
+        Insert: {
+          age?: number | null
+          avatar_url?: string | null
+          city?: string | null
+          congregation?: string | null
+          created_at?: string
+          full_name?: string
+          gender?: string | null
+          id: string
+          marriage_intent?: boolean | null
+          onboarding_complete?: boolean | null
+          testimony?: string | null
+          updated_at?: string
+          wants_children?: boolean | null
+        }
+        Update: {
+          age?: number | null
+          avatar_url?: string | null
+          city?: string | null
+          congregation?: string | null
+          created_at?: string
+          full_name?: string
+          gender?: string | null
+          id?: string
+          marriage_intent?: boolean | null
+          onboarding_complete?: boolean | null
+          testimony?: string | null
+          updated_at?: string
+          wants_children?: boolean | null
+        }
+        Relationships: []
+      }
       projects: {
         Row: {
           api_key: string | null
