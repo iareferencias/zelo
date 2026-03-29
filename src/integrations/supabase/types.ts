@@ -946,21 +946,53 @@ export type Database = {
         }
         Relationships: []
       }
+      preparation_progress: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          id: string
+          module_key: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          module_key: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          module_key?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null
           approved: boolean | null
           avatar_url: string | null
+          behavior_score: number
           city: string | null
           congregation: string | null
           created_at: string
+          family_vision: string | null
           full_name: string
           gender: string | null
           id: string
           invite_tree_depth: number | null
           invited_by: string | null
+          life_goals: string | null
           marriage_intent: boolean | null
           onboarding_complete: boolean | null
+          spiritual_routine: string | null
+          status_level: string
           testimony: string | null
           updated_at: string
           wants_children: boolean | null
@@ -969,16 +1001,21 @@ export type Database = {
           age?: number | null
           approved?: boolean | null
           avatar_url?: string | null
+          behavior_score?: number
           city?: string | null
           congregation?: string | null
           created_at?: string
+          family_vision?: string | null
           full_name?: string
           gender?: string | null
           id: string
           invite_tree_depth?: number | null
           invited_by?: string | null
+          life_goals?: string | null
           marriage_intent?: boolean | null
           onboarding_complete?: boolean | null
+          spiritual_routine?: string | null
+          status_level?: string
           testimony?: string | null
           updated_at?: string
           wants_children?: boolean | null
@@ -987,16 +1024,21 @@ export type Database = {
           age?: number | null
           approved?: boolean | null
           avatar_url?: string | null
+          behavior_score?: number
           city?: string | null
           congregation?: string | null
           created_at?: string
+          family_vision?: string | null
           full_name?: string
           gender?: string | null
           id?: string
           invite_tree_depth?: number | null
           invited_by?: string | null
+          life_goals?: string | null
           marriage_intent?: boolean | null
           onboarding_complete?: boolean | null
+          spiritual_routine?: string | null
+          status_level?: string
           testimony?: string | null
           updated_at?: string
           wants_children?: boolean | null

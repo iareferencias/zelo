@@ -8,6 +8,9 @@ import { toast } from "@/hooks/use-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { EmptyState } from "@/components/EmptyState";
 import { GridSkeleton } from "@/components/Skeletons";
+import { MatchCelebration } from "@/components/MatchCelebration";
+import { StatusBadge } from "@/components/StatusBadge";
+import { ProfileExpanded } from "@/components/ProfileExpanded";
 
 interface ProfileWithScore {
   id: string;
@@ -19,6 +22,10 @@ interface ProfileWithScore {
   gender: string;
   score: number;
   reasons: string[];
+  status_level?: string;
+  family_vision?: string;
+  spiritual_routine?: string;
+  life_goals?: string;
 }
 
 type ConnectionMode = "relacionamento" | "amizade";
@@ -32,6 +39,7 @@ export default function Compatibles() {
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
   const [currentIndex, setCurrentIndex] = useState(0);
   const [mode, setMode] = useState<ConnectionMode>("relacionamento");
+  const [matchCelebration, setMatchCelebration] = useState<{ matchId: string; partnerName: string } | null>(null);
 
   useEffect(() => {
     if (isDemoMode) {
@@ -50,7 +58,7 @@ export default function Compatibles() {
 
     const { data: profs } = await supabase
       .from("profiles")
-      .select("id, full_name, age, city, congregation, testimony, gender")
+      .select("id, full_name, age, city, congregation, testimony, gender, status_level, family_vision, spiritual_routine, life_goals")
       .neq("id", user.id)
       .eq("approved", true)
       .eq("marriage_intent", true);
@@ -74,7 +82,7 @@ export default function Compatibles() {
         candidate_id: p.id,
       });
       const result = scoreData?.[0] || { score: 0, reasons: [] };
-      scored.push({ ...p, score: result.score, reasons: result.reasons || [] });
+      scored.push({ ...p, score: result.score, reasons: result.reasons || [] } as ProfileWithScore);
     }
 
     scored.sort((a, b) => b.score - a.score);
@@ -91,7 +99,7 @@ export default function Compatibles() {
       }
       const isMutual = addDemoLike(toUser);
       if (isMutual) {
-        toast({ title: "🎉 Match criado!", description: "Vocês demonstraram interesse mútuo! Veja em Matches." });
+        setMatchCelebration({ matchId: "demo", partnerName: profiles.find(p => p.id === toUser)?.full_name || "Membro" });
       } else {
         toast({ title: "Interesse demonstrado", description: "Aguardando reciprocidade." });
       }
@@ -139,7 +147,8 @@ export default function Compatibles() {
         { user_id: toUser, type: "match_created", reference_id: match?.id },
       ] as any);
 
-      toast({ title: "Match criado!", description: "Vocês demonstraram interesse mútuo." });
+      const partnerName = profiles.find(p => p.id === toUser)?.full_name || "Membro";
+      setMatchCelebration({ matchId: match?.id || "", partnerName });
     } else {
       toast({ title: "Interesse demonstrado", description: "Aguardando reciprocidade." });
     }
@@ -174,6 +183,13 @@ export default function Compatibles() {
 
   return (
     <div className="page-transition">
+      <MatchCelebration
+        matchId={matchCelebration?.matchId || ""}
+        partnerName={matchCelebration?.partnerName || ""}
+        open={!!matchCelebration}
+        onClose={() => setMatchCelebration(null)}
+      />
+
       <div className="mb-8 flex items-end justify-between">
         <div>
           <h1 className="font-display text-3xl font-semibold text-foreground">Compatíveis</h1>
@@ -277,10 +293,15 @@ function ProfileCard({ profile, isLiked, canLike, onLike, onNext, hasNext, mode 
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
             <User className="h-6 w-6 text-muted-foreground" />
           </div>
-          <div>
-            <h2 className="font-display text-xl font-semibold text-foreground leading-tight">
-              {profile.full_name || "Sem nome"}
-            </h2>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <h2 className="font-display text-xl font-semibold text-foreground leading-tight">
+                {profile.full_name || "Sem nome"}
+              </h2>
+              {profile.status_level && profile.status_level !== "new" && (
+                <StatusBadge level={profile.status_level} />
+              )}
+            </div>
             <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
               {profile.age && <span>{profile.age} anos</span>}
               {profile.city && (
@@ -314,9 +335,17 @@ function ProfileCard({ profile, isLiked, canLike, onLike, onNext, hasNext, mode 
         {profile.testimony && (
           <div className="rounded-xl bg-muted/50 p-4 mb-4">
             <p className="text-xs font-medium text-foreground mb-1">Testemunho</p>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {profile.testimony}
-            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed">{profile.testimony}</p>
+          </div>
+        )}
+
+        {(profile.family_vision || profile.spiritual_routine || profile.life_goals) && (
+          <div className="mb-4">
+            <ProfileExpanded
+              familyVision={profile.family_vision || ""}
+              spiritualRoutine={profile.spiritual_routine || ""}
+              lifeGoals={profile.life_goals || ""}
+            />
           </div>
         )}
       </div>
