@@ -149,7 +149,7 @@ const Index = () => {
       </section>
 
       {/* Manifesto */}
-      <section className="py-32 px-6">
+      <section id="manifesto" className="py-32 px-6">
         <div className="mx-auto max-w-xl text-center">
           <motion.div
             className="mx-auto mb-6 h-px w-16 gold-gradient"
@@ -171,7 +171,7 @@ const Index = () => {
       </section>
 
       {/* Values */}
-      <section className="pb-32 px-6">
+      <section id="valores" className="pb-32 px-6">
         <div className="mx-auto grid max-w-2xl gap-1 sm:grid-cols-2">
           {[
             { icon: Shield, title: "Ambiente seguro", desc: "Cada perfil é validado antes de entrar." },
