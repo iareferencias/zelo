@@ -24,7 +24,30 @@ const menuSections = [
   { id: "manifesto", label: "Sobre" },
   { id: "valores", label: "Valores" },
   { id: "como-funciona", label: "Como funciona" },
+  { id: "planos", label: "Planos" },
   { id: "parceiros", label: "Parceiros" },
+];
+
+const freeBenefits = [
+  { text: "Ver perfis compatíveis", included: true },
+  { text: "3 curtidas por dia", included: true },
+  { text: "Receber matches", included: true },
+  { text: "Chat básico com matches", included: true },
+  { text: "Curtidas ilimitadas", included: false },
+  { text: "Ver quem curtiu você", included: false },
+  { text: "Perfil em destaque", included: false },
+  { text: "Filtros avançados", included: false },
+];
+
+const plusBenefits = [
+  { text: "Ver perfis compatíveis", included: true },
+  { text: "Curtidas ilimitadas", included: true },
+  { text: "Receber matches", included: true },
+  { text: "Chat completo com matches", included: true },
+  { text: "Ver quem curtiu você", included: true },
+  { text: "Perfil em destaque", included: true },
+  { text: "Filtros avançados", included: true },
+  { text: "Suporte prioritário", included: true },
 ];
 
 const Index = () => {
