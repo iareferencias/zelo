@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send, Flag, Heart } from "lucide-react";
+import { GuidedQuestions } from "@/components/GuidedQuestions";
 import { toast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -279,19 +280,20 @@ export default function Chat() {
       </div>
 
       {/* Input */}
-      <form onSubmit={sendMessage} className="mt-4 flex gap-2">
+      <form onSubmit={sendMessage} className="mt-4 flex items-center gap-2">
+        <GuidedQuestions onSelectQuestion={(q) => setNewMsg(q)} />
         <Input
           placeholder={dailyMsgCount >= 50 ? "Limite atingido" : "Mensagem..."}
           value={newMsg}
           onChange={e => setNewMsg(e.target.value)}
-          className="border-0 border-b border-border rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-foreground transition-colors duration-150"
+          className="border-0 border-b border-border rounded-none bg-transparent px-0 focus-visible:ring-0 focus-visible:border-accent transition-colors duration-150"
           disabled={dailyMsgCount >= 50}
         />
         <Button
           type="submit"
           size="icon"
           variant="ghost"
-          className="shrink-0 text-muted-foreground hover:text-foreground"
+          className="shrink-0 text-muted-foreground hover:text-accent"
           disabled={!newMsg.trim() || dailyMsgCount >= 50 || sending}
         >
           <Send className="h-4 w-4" />
