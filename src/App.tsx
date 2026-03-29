@@ -22,6 +22,7 @@ import AdminUsers from "./pages/app/admin/AdminUsers";
 import AdminReports from "./pages/app/admin/AdminReports";
 import AdminInvites from "./pages/app/admin/AdminInvites";
 import AdminAuditLogs from "./pages/app/admin/AdminAuditLogs";
+import AdminInviteTree from "./pages/app/admin/AdminInviteTree";
 import Onboarding from "./pages/Onboarding";
 import Banned from "./pages/Banned";
 import NotFound from "./pages/NotFound";
@@ -55,6 +56,7 @@ const App = () => (
               <Route path="admin/reports" element={<AdminReports />} />
               <Route path="admin/invites" element={<AdminInvites />} />
               <Route path="admin/audit" element={<AdminAuditLogs />} />
+              <Route path="admin/invite-tree" element={<AdminInviteTree />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
