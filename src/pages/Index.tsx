@@ -1,7 +1,13 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Shield, Heart, Clock, Eye } from "lucide-react";
+import { ArrowRight, Shield, Heart, Clock, Eye, Handshake, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import partnerVenue from "@/assets/partner-venue.jpg";
+import partnerBridal from "@/assets/partner-bridal.jpg";
+import partnerSalon from "@/assets/partner-salon.jpg";
+import partnerEvent from "@/assets/partner-event.jpg";
+import partnerCake from "@/assets/partner-cake.jpg";
+import partnerPhoto from "@/assets/partner-photo.jpg";
 
 const fade = {
   hidden: { opacity: 0, y: 10 },
