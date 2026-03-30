@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { RoleRoute } from "@/components/RoleRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -51,12 +52,12 @@ const App = () => (
               <Route path="preparacao" element={<Preparacao />} />
               <Route path="notifications" element={<Notifications />} />
               <Route path="plans" element={<Plans />} />
-              <Route path="admin/dashboard" element={<AdminDashboard />} />
-              <Route path="admin/users" element={<AdminUsers />} />
-              <Route path="admin/reports" element={<AdminReports />} />
-              <Route path="admin/invites" element={<AdminInvites />} />
-              <Route path="admin/audit" element={<AdminAuditLogs />} />
-              <Route path="admin/invite-tree" element={<AdminInviteTree />} />
+              <Route path="admin/dashboard" element={<RoleRoute access="admin"><AdminDashboard /></RoleRoute>} />
+              <Route path="admin/users" element={<RoleRoute access="admin"><AdminUsers /></RoleRoute>} />
+              <Route path="admin/reports" element={<RoleRoute access="staff"><AdminReports /></RoleRoute>} />
+              <Route path="admin/invites" element={<RoleRoute access="admin"><AdminInvites /></RoleRoute>} />
+              <Route path="admin/audit" element={<RoleRoute access="staff"><AdminAuditLogs /></RoleRoute>} />
+              <Route path="admin/invite-tree" element={<RoleRoute access="admin"><AdminInviteTree /></RoleRoute>} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

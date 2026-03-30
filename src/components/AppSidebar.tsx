@@ -1,4 +1,4 @@
-import { Users, Heart, BookOpen, User, Shield, LogOut, Ticket, LayoutDashboard, Bell, ScrollText, Handshake, Crown, TreePine } from "lucide-react";
+import { Users, Heart, BookOpen, User, Shield, LogOut, Ticket, LayoutDashboard, Bell, ScrollText, Crown, TreePine } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -24,14 +24,35 @@ const menuItems = [
   { title: "Planos", url: "/app/plans", icon: Crown },
 ];
 
+// Admin-only items
+const adminItems = [
+  { title: "Dashboard", url: "/app/admin/dashboard", icon: LayoutDashboard },
+  { title: "Usuários", url: "/app/admin/users", icon: Users },
+  { title: "Convites", url: "/app/admin/invites", icon: Ticket },
+  { title: "Árvore de Convites", url: "/app/admin/invite-tree", icon: TreePine },
+];
+
+// Items accessible by both admin and moderator
+const staffItems = [
+  { title: "Denúncias", url: "/app/admin/reports", icon: Shield },
+  { title: "Auditoria", url: "/app/admin/audit", icon: ScrollText },
+];
+
 export function AppSidebar() {
-  const { isAdmin, signOut } = useAuth();
+  const { isAdmin, isModerator, isStaff, signOut } = useAuth();
   const navigate = useNavigate();
 
   async function handleLogout() {
     await signOut();
     navigate("/");
   }
+
+  // Build admin menu based on role
+  const adminMenuItems = isAdmin
+    ? [...adminItems, ...staffItems]
+    : isModerator
+      ? staffItems
+      : [];
 
   return (
     <Sidebar className="border-r border-border">
@@ -60,19 +81,14 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        {isAdmin && (
+        {isStaff && (
           <SidebarGroup>
-            <SidebarGroupLabel className="text-[10px] tracking-[0.15em] uppercase text-muted-foreground px-5">Admin</SidebarGroupLabel>
+            <SidebarGroupLabel className="text-[10px] tracking-[0.15em] uppercase text-muted-foreground px-5">
+              {isAdmin ? "Admin" : "Moderação"}
+            </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {[
-                  { title: "Dashboard", url: "/app/admin/dashboard", icon: LayoutDashboard },
-                  { title: "Usuários", url: "/app/admin/users", icon: Users },
-                  { title: "Denúncias", url: "/app/admin/reports", icon: Shield },
-                  { title: "Convites", url: "/app/admin/invites", icon: Ticket },
-                  { title: "Auditoria", url: "/app/admin/audit", icon: ScrollText },
-                  { title: "Árvore de Convites", url: "/app/admin/invite-tree", icon: TreePine },
-                ].map((item) => (
+                {adminMenuItems.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
                       <NavLink
