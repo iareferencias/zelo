@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Ban, AlertTriangle, ShieldCheck, Pencil, Trash2 } from "lucide-react";
+import { CheckCircle, XCircle, Ban, AlertTriangle, ShieldCheck, Shield, Pencil, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -37,36 +37,53 @@ interface ProfileRow {
   created_at: string;
   warning_level: number;
   banned_until: string | null;
+  status_level: string;
+  behavior_score: number;
+}
+
+interface UserRole {
+  user_id: string;
+  role: string;
 }
 
 export default function AdminUsers() {
   const { user } = useAuth();
   const [profiles, setProfiles] = useState<ProfileRow[]>([]);
+  const [roles, setRoles] = useState<Map<string, string>>(new Map());
   const [loading, setLoading] = useState(true);
   const [banDays, setBanDays] = useState("7");
   const [banTarget, setBanTarget] = useState<string | null>(null);
   const [editTarget, setEditTarget] = useState<ProfileRow | null>(null);
   const [editForm, setEditForm] = useState({ full_name: "", city: "", congregation: "" });
+  const [search, setSearch] = useState("");
 
   useEffect(() => { load(); }, []);
 
   async function load() {
-    const { data } = await supabase
-      .from("profiles")
-      .select("id, full_name, city, congregation, approved, created_at, warning_level, banned_until")
-      .order("created_at", { ascending: false });
-    setProfiles((data as ProfileRow[]) || []);
+    const [{ data: profileData }, { data: roleData }] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("id, full_name, city, congregation, approved, created_at, warning_level, banned_until, status_level, behavior_score")
+        .order("created_at", { ascending: false }),
+      supabase.from("user_roles").select("user_id, role"),
+    ]);
+
+    setProfiles((profileData as ProfileRow[]) || []);
+
+    const roleMap = new Map<string, string>();
+    (roleData as UserRole[] || []).forEach((r) => roleMap.set(r.user_id, r.role));
+    setRoles(roleMap);
     setLoading(false);
   }
 
-  async function logAudit(action: string, targetId: string, metadata: Record<string, unknown> = {}) {
+  async function logAudit(action: string, targetId: string, details: Record<string, unknown> = {}) {
     if (!user) return;
     await supabase.from("audit_logs").insert({
-      actor_id: user.id,
+      admin_id: user.id,
       action,
-      target_id: targetId,
-      metadata,
-    } as any);
+      target_user_id: targetId,
+      details,
+    });
   }
 
   async function toggleApproval(id: string, approved: boolean) {
@@ -109,13 +126,24 @@ export default function AdminUsers() {
     setProfiles(ps => ps.map(p => p.id === id ? { ...p, warning_level: level } : p));
   }
 
-  async function makeAdmin(id: string) {
-    const { error } = await supabase.from("user_roles").insert({ user_id: id, role: "admin" });
-    if (error) {
-      toast({ title: "Erro", description: error.code === "23505" ? "Já é admin" : error.message, variant: "destructive" });
+  async function setRole(id: string, newRole: string) {
+    if (newRole === "user") {
+      // Remove role entry (default is user)
+      await supabase.from("user_roles").delete().eq("user_id", id);
+      setRoles(prev => { const m = new Map(prev); m.delete(id); return m; });
+      await logAudit("remove_role", id);
+      toast({ title: "Role removida — agora é usuário comum" });
     } else {
-      await logAudit("make_admin", id);
-      toast({ title: "Usuário promovido a admin" });
+      // Upsert role
+      const existing = roles.get(id);
+      if (existing) {
+        await supabase.from("user_roles").update({ role: newRole as any }).eq("user_id", id);
+      } else {
+        await supabase.from("user_roles").insert({ user_id: id, role: newRole as any });
+      }
+      setRoles(prev => new Map(prev).set(id, newRole));
+      await logAudit("set_role", id, { role: newRole });
+      toast({ title: `Promovido a ${newRole}` });
     }
   }
 
@@ -154,22 +182,51 @@ export default function AdminUsers() {
 
   const isBanned = (p: ProfileRow) => p.banned_until && new Date(p.banned_until) > new Date();
 
-  if (loading) return <div className="text-center text-muted-foreground">Carregando...</div>;
+  const filtered = profiles.filter(p =>
+    !search.trim() ||
+    p.full_name?.toLowerCase().includes(search.toLowerCase()) ||
+    p.city?.toLowerCase().includes(search.toLowerCase()) ||
+    p.congregation?.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const getRoleBadge = (id: string) => {
+    const role = roles.get(id);
+    if (role === "admin") return <Badge className="bg-accent text-accent-foreground">Admin</Badge>;
+    if (role === "moderator") return <Badge variant="outline" className="border-blue-400 text-blue-600">Moderador</Badge>;
+    return null;
+  };
+
+  if (loading) return <div className="flex items-center justify-center min-h-[200px]"><div className="animate-pulse text-muted-foreground">Carregando...</div></div>;
 
   return (
-    <div>
-      <h1 className="mb-2 font-serif text-3xl font-semibold text-foreground">Gerenciar Usuários</h1>
-      <p className="mb-6 text-sm text-muted-foreground">{profiles.length} usuários cadastrados</p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="font-serif text-2xl font-semibold text-foreground">Gerenciar Usuários</h1>
+        <p className="text-sm text-muted-foreground">{profiles.length} usuários cadastrados</p>
+      </div>
+
+      <Input
+        placeholder="Buscar por nome, cidade ou congregação..."
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        className="max-w-sm"
+      />
+
       <div className="space-y-3">
-        {profiles.map(p => (
+        {filtered.map(p => (
           <Card key={p.id} className={isBanned(p) ? "border-destructive/30" : ""}>
             <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-foreground">{p.full_name || "Sem nome"}</p>
-                  <p className="text-xs text-muted-foreground">{p.city} • {p.congregation}</p>
-                  <p className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleDateString("pt-BR")}</p>
-                  <div className="mt-1 flex gap-1.5">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-medium text-foreground">{p.full_name || "Sem nome"}</p>
+                    {getRoleBadge(p.id)}
+                  </div>
+                  <p className="text-xs text-muted-foreground">{p.city || "—"} • {p.congregation || "—"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(p.created_at).toLocaleDateString("pt-BR")} · Score: {p.behavior_score} · {p.status_level}
+                  </p>
+                  <div className="mt-1.5 flex gap-1.5 flex-wrap">
                     <Badge variant={p.approved ? "default" : "secondary"}>
                       {p.approved ? "Aprovado" : "Pendente"}
                     </Badge>
@@ -182,22 +239,25 @@ export default function AdminUsers() {
                     {isBanned(p) && (
                       <Badge variant="destructive">
                         <Ban className="mr-1 h-3 w-3" />
-                        Banido
+                        Banido até {new Date(p.banned_until!).toLocaleDateString("pt-BR")}
                       </Badge>
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-1">
+
+                <div className="flex items-center gap-1 flex-wrap">
+                  {/* Approve/Unapprove */}
                   {p.approved ? (
                     <Button size="sm" variant="ghost" onClick={() => toggleApproval(p.id, false)} title="Remover aprovação">
                       <XCircle className="h-4 w-4 text-destructive" />
                     </Button>
                   ) : (
                     <Button size="sm" variant="ghost" onClick={() => toggleApproval(p.id, true)} title="Aprovar">
-                      <CheckCircle className="h-4 w-4 text-accent" />
+                      <CheckCircle className="h-4 w-4 text-green-600" />
                     </Button>
                   )}
 
+                  {/* Warning level */}
                   <Select value={String(p.warning_level)} onValueChange={v => setWarning(p.id, parseInt(v))}>
                     <SelectTrigger className="w-[80px] h-8 text-xs">
                       <SelectValue />
@@ -210,8 +270,9 @@ export default function AdminUsers() {
                     </SelectContent>
                   </Select>
 
+                  {/* Ban / Unban */}
                   {isBanned(p) ? (
-                    <Button size="sm" variant="outline" onClick={() => unban(p.id)}>
+                    <Button size="sm" variant="outline" onClick={() => unban(p.id)} className="text-xs">
                       Desbanir
                     </Button>
                   ) : (
@@ -236,14 +297,24 @@ export default function AdminUsers() {
                     </Dialog>
                   )}
 
-                  <Button size="sm" variant="ghost" onClick={() => makeAdmin(p.id)} title="Tornar admin">
-                    <ShieldCheck className="h-4 w-4 text-accent" />
-                  </Button>
+                  {/* Role management */}
+                  <Select value={roles.get(p.id) || "user"} onValueChange={v => setRole(p.id, v)}>
+                    <SelectTrigger className="w-[110px] h-8 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="user">Usuário</SelectItem>
+                      <SelectItem value="moderator">Moderador</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
 
+                  {/* Edit */}
                   <Button size="sm" variant="ghost" onClick={() => openEdit(p)} title="Editar">
                     <Pencil className="h-4 w-4" />
                   </Button>
 
+                  {/* Delete */}
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button size="sm" variant="ghost" title="Excluir">
@@ -270,6 +341,12 @@ export default function AdminUsers() {
             </CardContent>
           </Card>
         ))}
+
+        {filtered.length === 0 && (
+          <p className="text-center text-muted-foreground mt-8">
+            {search ? "Nenhum resultado encontrado." : "Nenhum usuário cadastrado."}
+          </p>
+        )}
       </div>
 
       {/* Edit Dialog */}
