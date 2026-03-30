@@ -978,6 +978,7 @@ export type Database = {
           age: number | null
           approved: boolean | null
           avatar_url: string | null
+          banned_until: string | null
           behavior_score: number
           city: string | null
           congregation: string | null
@@ -996,11 +997,13 @@ export type Database = {
           testimony: string | null
           updated_at: string
           wants_children: boolean | null
+          warning_level: number
         }
         Insert: {
           age?: number | null
           approved?: boolean | null
           avatar_url?: string | null
+          banned_until?: string | null
           behavior_score?: number
           city?: string | null
           congregation?: string | null
@@ -1019,11 +1022,13 @@ export type Database = {
           testimony?: string | null
           updated_at?: string
           wants_children?: boolean | null
+          warning_level?: number
         }
         Update: {
           age?: number | null
           approved?: boolean | null
           avatar_url?: string | null
+          banned_until?: string | null
           behavior_score?: number
           city?: string | null
           congregation?: string | null
@@ -1042,6 +1047,7 @@ export type Database = {
           testimony?: string | null
           updated_at?: string
           wants_children?: boolean | null
+          warning_level?: number
         }
         Relationships: []
       }
