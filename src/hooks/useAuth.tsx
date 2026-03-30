@@ -1,13 +1,17 @@
 import { useState, useEffect, createContext, useContext } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+
+type AppRole = "admin" | "moderator" | "user" | null;
 
 interface AuthContextType {
   session: Session | null;
   user: User | null;
   loading: boolean;
+  role: AppRole;
   isAdmin: boolean;
+  isModerator: boolean;
+  isStaff: boolean; // admin OR moderator
   signUp: (email: string, password: string) => Promise<{ error: any; data: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -19,37 +23,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [role, setRole] = useState<AppRole>(null);
+
+  const isAdmin = role === "admin";
+  const isModerator = role === "moderator";
+  const isStaff = isAdmin || isModerator;
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        setTimeout(() => checkAdmin(session.user.id), 0);
+        setTimeout(() => fetchRole(session.user.id), 0);
       } else {
-        setIsAdmin(false);
+        setRole(null);
       }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) checkAdmin(session.user.id);
+      if (session?.user) fetchRole(session.user.id);
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  async function checkAdmin(userId: string) {
+  async function fetchRole(userId: string) {
     const { data, error } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", userId)
-      .eq("role", "admin")
       .maybeSingle();
-    setIsAdmin(!error && !!data);
+    if (!error && data) {
+      setRole(data.role as AppRole);
+    } else {
+      setRole("user");
+    }
   }
 
   async function signUp(email: string, password: string) {
@@ -71,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ session, user, loading, isAdmin, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ session, user, loading, role, isAdmin, isModerator, isStaff, signUp, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );
