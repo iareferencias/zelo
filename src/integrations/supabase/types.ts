@@ -1431,6 +1431,53 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_configs: {
+        Row: {
+          active: boolean | null
+          atualizado_em: string | null
+          auth_token: string | null
+          criado_em: string | null
+          empresa_id: number
+          headers: Json | null
+          id: number
+          payload_type: string | null
+          url_agendamento: string | null
+          url_contato: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          atualizado_em?: string | null
+          auth_token?: string | null
+          criado_em?: string | null
+          empresa_id: number
+          headers?: Json | null
+          id?: number
+          payload_type?: string | null
+          url_agendamento?: string | null
+          url_contato?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          atualizado_em?: string | null
+          auth_token?: string | null
+          criado_em?: string | null
+          empresa_id?: number
+          headers?: Json | null
+          id?: number
+          payload_type?: string | null
+          url_agendamento?: string | null
+          url_contato?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_configs_empresa_id_fkey"
+            columns: ["empresa_id"]
+            isOneToOne: true
+            referencedRelation: "empresas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       sms_templates: {
