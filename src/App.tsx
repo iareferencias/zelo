@@ -11,13 +11,16 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Waitlist from "./pages/Waitlist";
 import AppLayout from "./pages/app/AppLayout";
-import Compatibles from "./pages/app/Compatibles";
-import Matches from "./pages/app/Matches";
-import Chat from "./pages/app/Chat";
+import Feed from "./pages/app/Feed";
+import Conexoes from "./pages/app/Conexoes";
+import Oportunidades from "./pages/app/Oportunidades";
 import Profile from "./pages/app/Profile";
 import Preparacao from "./pages/app/Preparacao";
 import Notifications from "./pages/app/Notifications";
 import Plans from "./pages/app/Plans";
+import Chat from "./pages/app/Chat";
+import Matches from "./pages/app/Matches";
+import Compatibles from "./pages/app/Compatibles";
 import AdminDashboard from "./pages/app/admin/AdminDashboard";
 import AdminUsers from "./pages/app/admin/AdminUsers";
 import AdminReports from "./pages/app/admin/AdminReports";
@@ -45,7 +48,10 @@ const App = () => (
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/banned" element={<Banned />} />
             <Route path="/app" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-              <Route index element={<Compatibles />} />
+              <Route index element={<Feed />} />
+              <Route path="conexoes" element={<Conexoes />} />
+              <Route path="oportunidades" element={<Oportunidades />} />
+              <Route path="compatibles" element={<Compatibles />} />
               <Route path="matches" element={<Matches />} />
               <Route path="chat/:matchId" element={<Chat />} />
               <Route path="profile" element={<Profile />} />
